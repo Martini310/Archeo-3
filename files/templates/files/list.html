@@ -1,0 +1,17 @@
+{% extends 'home.html' %}
+
+
+{% block content %}
+    
+    <h1>LIST</h1>
+    
+    <ul>
+        
+        {% for car in vehicle_list %}
+            <li>{{car}}</li>
+        {% endfor %}
+            
+
+    </ul>
+{% endblock content %}
+    

@@ -1,0 +1,38 @@
+{% extends 'home.html' %}
+
+
+{% block content %}
+    <h1>Create new custom Order</h1>
+
+    <form method="POST" action="" id="tr">
+        {% csrf_token %}
+        <input type="hidden" name="input_counter" value="2" id="js_data">
+        <input type="text" name="t0"><br>
+        <input type="text" name="t1"><br>
+        <button type="submit" id="submit">Create</button>
+        </form>
+        <br>
+        <button onclick="addInput()">Dodaj pole</button>
+
+    <script>
+        var counter = 2
+        function addInput() {
+            var formId = document.getElementById('tr');
+            var input = document.createElement("input");
+            input.type = 'text';
+            input.name = 't' + counter;
+            var br = document.createElement("br");
+            var submit = document.createElement("button");
+            submit.type = 'submit';
+            submit.id = 'submit';
+            submit.textContent = 'Create';
+            document.getElementById("submit").remove();
+            formId.appendChild(input);
+            formId.appendChild(br);
+            formId.appendChild(submit)
+            counter ++;
+            document.getElementById('js_data').value = counter;
+        }
+    </script>
+
+{% endblock content %}
