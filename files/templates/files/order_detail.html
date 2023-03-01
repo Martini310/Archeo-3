@@ -1,0 +1,8 @@
+{% extends 'home.html' %}
+
+{% block content %}
+    {{order}}
+    {% for vehicle in order.vehicles.all %}
+        <ol>{{vehicle}}</ol>
+    {% endfor %}
+{% endblock content %}
