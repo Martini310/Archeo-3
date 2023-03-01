@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Order(models.Model):
     order_date = models.DateTimeField()
+    orderer = models.ForeignKey(User, on_delete=models.RESTRICT)
+
+    def __str__(self) -> str:
+        return f"Zamówienie nr {self.id}. Data: {self.order_date}. Zamawiający: {self.orderer}"
 
 
 class Vehicle(models.Model):
@@ -19,7 +23,7 @@ class Vehicle(models.Model):
         ('e', 'rejected')
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
-    order = models.ManyToManyField(Order)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
-        return f"{self.tr}, pobrał: {self.responsible_person}, status: {self.status}, zamówienie: {self.order}"
+        return f"{self.tr}, POBRAŁ: {self.responsible_person}, STATUS: {self.status}, ZAMÓWIENIE: {self.order.id}"
