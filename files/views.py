@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Order, Vehicle, User
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 from datetime import datetime
 from django.utils import timezone
@@ -46,18 +46,3 @@ def my_order(request):
 
     else:
         return render(request, 'files/my_order.html')
-    
-
-class Orders(ListView):
-    model = Order
-    fields = "__all__"
-
-
-class OrderDetails(DetailView):
-    model = Order
-    
-
-class VehicleUpdateView(UpdateView):
-    model = Vehicle
-    fields = '__all__'
-    success_url = reverse_lazy('files:orders')
