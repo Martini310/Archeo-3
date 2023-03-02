@@ -1,0 +1,15 @@
+{% extends 'home.html' %}
+
+{% block content %}
+
+<h1>test</h1>
+
+    {% for s, n in abr %}
+        <h4><a href="/files/orders_to_do/{{s}}">{{n}}</a></h4>
+    {% endfor %}
+
+    {% for order in orders %}
+        <h3><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a> Liczba teczek {{order.vehicles.all.count}}</h3>
+    {% endfor %}
+
+{% endblock content %}

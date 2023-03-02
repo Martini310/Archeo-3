@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from .models import Order, Vehicle, User
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy
-from datetime import datetime
 from django.utils import timezone
 from django.contrib import messages
 
@@ -38,13 +37,13 @@ def my_order(request):
 
         try:
             user = User.objects.get(pk=1)
-            order = Order.objects.create(order_date=datetime.now(tz=timezone.utc) ,orderer=user)
+            order = Order.objects.create(order_date=timezone.now() ,orderer=user)
             Vehicle.objects.bulk_create([Vehicle(tr=x, responsible_person=user, order=order) for x in ids])
             return redirect(reverse_lazy('files:list'))
         
         except:
             print("ups")  
-
+            
     else:
         return render(request, 'files/my_order.html')
     
@@ -58,11 +57,14 @@ class OrdersToDo(ListView):
     model = Order
     template_name = 'files/orderstodo_list.html'
     context_object_name = 'todo'
-    
 
-# class OrderDetails(DetailView):
-#     model = Order
-    
+
+def orders_to_do(request, status):
+    orders = Order.objects.all()
+    orders = [order for order in orders if any([vehicle.status for vehicle in order.vehicles.all() if vehicle.status == status])]
+    abr = Vehicle.LOAN_STATUS
+    return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
+
 
 class VehicleUpdateView(UpdateView):
     model = Vehicle
@@ -83,3 +85,4 @@ def order_details(request, pk):
 
     else:
         return render(request, 'files/order_detail.html', context={'order': order})
+    

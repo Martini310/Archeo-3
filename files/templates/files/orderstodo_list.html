@@ -5,15 +5,11 @@
 
 <ul>
     {% for order in todo %}
-        
-        {% if order.vehicles.all %}
-            
-            {% for x in order.vehicles.all %}
-                {{x.status}}
-            {% endfor %}
-                
-        {% endif %}
-            
+
+        {% for vehicle in order.vehicles.all %}
+            {{vehicle.status}}
+        {% endfor %}
+             
         <li><h3><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></h3></li>
             <ul>
                 {% for vehicle in order.vehicles.all %}

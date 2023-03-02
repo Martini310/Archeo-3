@@ -10,6 +10,7 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col">Nr rejestracyjny</th>
+        <th scope="col">Status</th>
         <th scope="col">check</th>
       </tr>
     </thead>
@@ -19,6 +20,7 @@
         <tr>
             <th scope="row">{{forloop.counter}}</th>
             <td>{{vehicle.tr}}</td>
+            <td>{{vehicle.status}}</td>
             <td>
             {% if event.approved %}
                 <div class="form-check">
