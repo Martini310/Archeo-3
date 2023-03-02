@@ -1,0 +1,33 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<h1>Lista zamówień do realizacji</h1>
+
+<ul>
+    {% for order in todo %}
+        
+        {% if order.vehicles.all %}
+            
+            {% for x in order.vehicles.all %}
+                {{x.status}}
+            {% endfor %}
+                
+        {% endif %}
+            
+        <li><h3><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></h3></li>
+            <ul>
+                {% for vehicle in order.vehicles.all %}
+                    
+                    {% if vehicle.status == 'o' %}
+                        <li>
+                        <a href="/files/update/{{vehicle.id}}/">{{vehicle.tr}}</a>
+                        </li>
+                    {% endif %}
+    
+                {% endfor %}
+            </ul>
+           
+    {% endfor %}
+</ul>
+
+{% endblock content %}

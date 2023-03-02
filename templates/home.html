@@ -19,13 +19,13 @@
               <a class="nav-link active" aria-current="page" href={% url "files:list" %}>List</a>
               <a class="nav-link" href={% url "files:add" %}>Add</a>
               <a class="nav-link" href={% url "files:order" %}>Order</a>
-              <a class="nav-link" href={% url "files:my_order" %}>Order</a>
+              <a class="nav-link" href={% url "files:my_order" %}>My Order</a>
+              <a class="nav-link" href={% url "files:orders" %}>Orders list</a>
+              <a class="nav-link" href={% url "files:orderstodo" %}>Orders to do</a>
             </div>
           </div>
         </div>
       </nav>
-
-      
       {% block content %}
         
       {% endblock content %}
