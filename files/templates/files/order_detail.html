@@ -11,7 +11,7 @@
         <th scope="col">#</th>
         <th scope="col">Nr rejestracyjny</th>
         <th scope="col">Status</th>
-        <th scope="col">check</th>
+        <th scope="col"><input class="form-check-input" type="checkbox" value="Select All" onclick="selectAll(this)" id="TestAll" /> check</th>
       </tr>
     </thead>
     <tbody>
@@ -24,11 +24,11 @@
             <td>
             {% if event.approved %}
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes">
+                    <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll">
                 </div>
                 {% else %}
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes">
+                    <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll">
                 </div>
             {% endif %}
                 </td>
@@ -39,6 +39,16 @@
   <br/>
   <button class="btn btn-secondary" type="submit">Save</button>
 </form>
+
+
+<script>
+    function selectAll(checkBox) {
+        get = document.getElementsByName('boxes');
+        for(var i=0; i<get.length; i++) {
+            get[i].checked = checkBox.checked;
+        }
+    }
+</script>
 
 {% endblock content %}
 

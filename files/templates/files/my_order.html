@@ -1,38 +1,60 @@
 {% extends 'home.html' %}
 
-
 {% block content %}
     <h1>Create new custom Order</h1>
+    <button onclick="addInput()">Dodaj pole</button>
+    <br>
 
     <form method="POST" action="" id="tr">
         {% csrf_token %}
-        <input type="hidden" name="input_counter" value="2" id="js_data">
-        <input type="text" name="t0"><br>
-        <input type="text" name="t1"><br>
+        <input type="hidden" name="input_counter" value="11" id="js_data">
+        {% for n in range %}
+            <div class="input-group" id="tr-div">
+                <span class="input-group-text">{{n}}</span>
+                <input type="text" name="t{{n}}" placeholder="nr rejestracyjny" class="form-control">
+                <input type="text" name="k{{n}}" placeholder="uwagi" class="form-control">
+            </div>
+        {% endfor %}
         <button type="submit" id="submit">Create</button>
     </form>
 
     <br>
-    <button onclick="addInput()">Dodaj pole</button>
-
+ 
     <script>
-        var counter = 2
+        var counter = 11
         function addInput() {
             var formId = document.getElementById('tr');
+
+            var div = document.createElement('div');
+            div.className = 'input-group';
+
+            var span = document.createElement('span')
+            span.className = 'input-group-text';
+            span.textContent = counter;
+
             var input = document.createElement("input");
             input.type = 'text';
             input.name = 't' + counter;
-            var br = document.createElement("br");
+            input.placeholder = 'nr rejestracyjny';
+            input.className = 'form-control';
+
+            var comment = document.createElement("input");
+            comment.type = 'text';
+            comment.name = 'k' + counter;
+            comment.placeholder = 'uwagi';
+            comment.className = 'form-control';
+
             var submit = document.createElement("button");
             submit.type = 'submit';
             submit.id = 'submit';
             submit.textContent = 'Create';
             document.getElementById("submit").remove();
-            formId.appendChild(input);
-            formId.appendChild(br);
-            formId.appendChild(submit)
-            counter ++;
+
+            div.append(span, input, comment);
+            formId.append(div, submit);
+
             document.getElementById('js_data').value = counter;
+            counter ++;
         }
     </script>
 

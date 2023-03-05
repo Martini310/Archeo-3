@@ -32,20 +32,21 @@ class AddOrder(CreateView):
 
 def my_order(request):
     if request.method == 'POST':
-        # list of values from inputs in my_order.html ['t1', 't2' ...]
-        ids = [request.POST.get('t'+str(i)) for i in range(int(request.POST.get('input_counter')))]
+        post = request.POST
+        # list of values from inputs in my_order.html [(tr, comment),..]
+        ids = [(post.get('t'+str(i)), post.get('k'+str(i))) for i in range(1, int(post.get('input_counter'))) if post.get('t'+str(i)) != '']
 
         try:
             user = User.objects.get(pk=1)
             order = Order.objects.create(order_date=timezone.now() ,orderer=user)
-            Vehicle.objects.bulk_create([Vehicle(tr=x, responsible_person=user, order=order) for x in ids])
+            Vehicle.objects.bulk_create([Vehicle(tr=x[0], responsible_person=user, order=order, comments=x[1]) for x in ids])
             return redirect(reverse_lazy('files:list'))
         
         except:
             print("ups")  
             
     else:
-        return render(request, 'files/my_order.html')
+        return render(request, 'files/my_order.html', {'range': range(1, 11)})
     
 
 class Orders(ListView):
