@@ -4,12 +4,26 @@
 
 <h1>test</h1>
 
+<div class="btn-group"></div>
     {% for s, n in abr %}
-        <h4><a href="/files/orders_to_do/{{s}}">{{n}}</a></h4>
+        {% if request.path|stringformat:'s'|slice:'-1:' == s %}
+            <a href="/files/orders_to_do/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
+        {% else %}
+            <a href="/files/orders_to_do/{{s}}" class="btn btn-primary">{{n}}</a>
+        {% endif %}
     {% endfor %}
+</div>
 
+
+<table class="table table-primary table-hover">
     {% for order in orders %}
-        <h3><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a> Liczba teczek {{order.vehicles.all.count}}</h3>
+    <tr>
+    <td>{{forloop.counter}}</td>
+    <td><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></td>
+    <td>Liczba teczek {{order.vehicles.all.count}}</td>
+    </tr>
     {% endfor %}
-
+</table>
+    
 {% endblock content %}
+    
