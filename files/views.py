@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Order, Vehicle, User
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, FormView
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib import messages
-
+from .forms import ReturnForm
+from django.http import FileResponse
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
 
 # Create your views here.
 def list_cars(request):
@@ -87,3 +92,54 @@ def order_details(request, pk):
     else:
         return render(request, 'files/order_detail.html', context={'order': order})
     
+
+class ReturnFormView(FormView):
+    form_class = ReturnForm
+    template_name = 'files/return.html'
+
+    success_url = '/files/list/'
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+
+        Vehicle.objects.filter(tr=form.cleaned_data['tr']).update(status='r')
+
+        return super().form_valid(form)
+    
+
+def gen_pdf(request, pk):
+    # Create Bytestream buffer
+    buf = io.BytesIO()
+    # Create a canvas
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    # Create a text object
+    textob = c.beginText()
+    textob.setTextOrigin(inch, inch)
+    textob.setFont("Helvetica", 14)
+
+    order = Order.objects.get(pk=pk)
+
+    # Add some lines of text
+    lines = [
+        "This is line 1", 
+        "This is line 2", 
+        "This is line 3"
+    ]
+    
+    for v in order.vehicles.all():
+        lines.append(v.tr)
+        lines.append(v.status)
+
+    # loop
+    for line in lines:
+        textob.textLine(line)
+
+    # Finish Up
+    c.drawText(textob)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+
+    return FileResponse(buf, as_attachment=True, filename='test.pdf')
+
+
