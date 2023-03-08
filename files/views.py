@@ -8,9 +8,11 @@ from django.contrib import messages
 from .forms import ReturnForm
 from django.http import FileResponse
 import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import letter
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.units import inch
+# from reportlab.lib.pagesizes import letter
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 # Create your views here.
 def list_cars(request):
@@ -41,6 +43,12 @@ def my_order(request):
         # list of values from inputs in my_order.html [(tr, comment),..]
         ids = [(post.get('t'+str(i)), post.get('k'+str(i))) for i in range(1, int(post.get('input_counter'))) if post.get('t'+str(i)) != '']
 
+
+        for v in ids:
+            vehicle = Vehicle.objects.filter(tr=v[0], status='o')
+            if vehicle:
+                messages.error(request, "Teczka wypożyczona")
+                return render(request, 'files/my_order.html', {'range': range(1, 11)})
         try:
             user = User.objects.get(pk=1)
             order = Order.objects.create(order_date=timezone.now() ,orderer=user)
@@ -97,13 +105,12 @@ class ReturnFormView(FormView):
     form_class = ReturnForm
     template_name = 'files/return.html'
 
-    success_url = '/files/list/'
-
+    success_url = '/files/return/'
+    
     def form_valid(self, form):
         print(form.cleaned_data)
-
-        Vehicle.objects.filter(tr=form.cleaned_data['tr']).update(status='r')
-
+        Vehicle.objects.filter(tr=form.cleaned_data['tr'], status='o').update(status='r')
+        
         return super().form_valid(form)
     
 
