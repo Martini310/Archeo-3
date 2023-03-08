@@ -13,6 +13,7 @@ import io
 # from reportlab.lib.pagesizes import letter
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.contrib.messages.views import SuccessMessageMixin
 
 # Create your views here.
 def list_cars(request):
@@ -101,12 +102,13 @@ def order_details(request, pk):
         return render(request, 'files/order_detail.html', context={'order': order})
     
 
-class ReturnFormView(FormView):
+class ReturnFormView(SuccessMessageMixin, FormView):
     form_class = ReturnForm
     template_name = 'files/return.html'
 
     success_url = '/files/return/'
-    
+    success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
+
     def form_valid(self, form):
         print(form.cleaned_data)
         Vehicle.objects.filter(tr=form.cleaned_data['tr'], status='o').update(status='r')
