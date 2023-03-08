@@ -2,10 +2,12 @@ from django import forms
 from . import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
 
 def validate_not_returned(value):
-    vehicle = models.Vehicle.objects.filter(tr=value, status__in='era')
-    if vehicle:
+    vehicle = models.Vehicle.objects.filter(tr=value, status='o')
+    if not vehicle:
+        print(vehicle)
         raise ValidationError(
             _('%(value)s - nie ma takiej teczki'),
             params={'value': value},

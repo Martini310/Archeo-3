@@ -2,19 +2,12 @@
 
 {% block content %}
 
-<h1>Form View Template (contact.html)</h1>
+<h1>Form View Template </h1>
 <form action="" method="POST">
     {% csrf_token %}
     {{form.as_p}}
     <input type="submit" value="Submit">
 </form>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
 
 {% endblock content %}
