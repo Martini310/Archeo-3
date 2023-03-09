@@ -6,7 +6,7 @@
 
 <div class="btn-group"></div>
     {% for s, n in abr %}
-        {% if request.path|stringformat:'s'|slice:'-1:' == s %}
+        {% if request.path|stringformat:'s'|slice:'-2:-1' == s %}
             <a href="/files/orders_to_do/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
         {% else %}
             <a href="/files/orders_to_do/{{s}}" class="btn btn-primary">{{n}}</a>
@@ -15,7 +15,7 @@
 </div>
 
 
-<table class="table table-primary table-hover">
+<table class="table table-secondary table-hover">
     {% for order in orders %}
     <tr>
     <td>{{forloop.counter}}</td>

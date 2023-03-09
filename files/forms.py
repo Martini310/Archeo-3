@@ -16,9 +16,10 @@ def validate_not_returned(value):
 
 class ReturnForm(forms.ModelForm):
     class Meta:
-        model = models.User
-        fields = []
+        model = models.Vehicle
+        fields = ['tr', 'returner', 'comments']
 
-    tr = forms.CharField(validators=[validate_not_returned])
-    returner = forms.ModelChoiceField(queryset=models.User.objects.all())
+        
+    # tr = forms.CharField(validators=[validate_not_returned])
+    # returner = forms.ModelChoiceField(queryset=models.User.objects.all())
     

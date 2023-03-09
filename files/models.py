@@ -15,7 +15,7 @@ class Vehicle(models.Model):
     transfer_date = models.DateTimeField(blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     responsible_person = models.ForeignKey(User, related_name="vehicles", on_delete=models.RESTRICT)
-    comments = models.CharField(max_length=100)
+    comments = models.CharField(max_length=100, null=True, blank=True)
     LOAN_STATUS = (
         ('a', 'Awaits'), 
         ('o', 'On Loan'), 
@@ -24,6 +24,7 @@ class Vehicle(models.Model):
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
     order = models.ForeignKey(Order, related_name="vehicles", on_delete=models.SET_NULL, null=True)
+    returner = models.ForeignKey(User, related_name='vehicles_returner', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.tr}, POBRAŁ: {self.responsible_person}, STATUS: {self.status}, ZAMÓWIENIE: {self.order.id}"

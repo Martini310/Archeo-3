@@ -4,15 +4,11 @@ from . import views
 app_name = 'files'
 
 urlpatterns = [
-    path('list/', views.list_cars, name='list'),
+    path('list/', views.ListAllVechicles.as_view(), name='list'),
     path('add/', views.AddVehicle.as_view(), name='add'), 
-    path('order/', views.AddOrder.as_view(), name='order'), 
     path('my_order/', views.my_order, name='my_order'), 
-    path('orders/', views.Orders.as_view(), name='orders'), 
     path('order_details/<int:pk>/', views.order_details, name='order_details'), 
     path('update/<int:pk>/', views.VehicleUpdateView.as_view(), name='update_vehicle'), 
-    path('orderstodo/', views.OrdersToDo.as_view(), name='orderstodo'), 
     path('orders_to_do/<str:status>/', views.orders_to_do, name='orders_to_do'), 
-    path('order_details/<int:pk>/gen_pdf/', views.gen_pdf, name='gen_pdf'), 
     path('return/', views.ReturnFormView.as_view(), name='return')
 ]

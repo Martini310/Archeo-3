@@ -16,25 +16,15 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.messages.views import SuccessMessageMixin
 
 # Create your views here.
-def list_cars(request):
-    context = {'vehicle_list': Vehicle.objects.all()}
-    return render(request, 'files/list.html', context=context)
-
-
 class ListAllVechicles(ListView):
     model = Vehicle
     template_name = 'files/list.html'
+    context_object_name = 'vehicle_list'
 
 
 class AddVehicle(CreateView):
     model = Vehicle
     fields = "__all__"
-    success_url = reverse_lazy('files:list')
-
-
-class AddOrder(CreateView):
-    model = Order
-    fields = '__all__'
     success_url = reverse_lazy('files:list')
 
 
@@ -62,17 +52,6 @@ def my_order(request):
     else:
         return render(request, 'files/my_order.html', {'range': range(1, 11)})
     
-
-class Orders(ListView):
-    model = Order
-    fields = "__all__"
-
-
-class OrdersToDo(ListView):
-    model = Order
-    template_name = 'files/orderstodo_list.html'
-    context_object_name = 'todo'
-
 
 def orders_to_do(request, status):
     orders = Order.objects.all()

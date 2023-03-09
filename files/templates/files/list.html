@@ -1,17 +1,13 @@
 {% extends 'home.html' %}
 
-
 {% block content %}
     
-    <h1>LIST</h1>
+    <h1>LIST OF ALL VEHICLES</h1>
     
     <ul>
-        
         {% for car in vehicle_list %}
-            <li>{{car}}</li>
+            <li>{{car}} <a href="/files/update/{{car.id}}/">edytuj</a></li>
         {% endfor %}
-            
-
     </ul>
 {% endblock content %}
     
