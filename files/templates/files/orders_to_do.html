@@ -15,12 +15,13 @@
 </div>
 
 
-<table class="table table-secondary table-hover">
+<table class="table table-striped table-secondary table-hover">
     {% for order in orders %}
     <tr>
     <td>{{forloop.counter}}</td>
     <td><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></td>
     <td>Liczba teczek {{order.vehicles.all.count}}</td>
+    <td>{{order.orderer}}</td>
     </tr>
     {% endfor %}
 </table>

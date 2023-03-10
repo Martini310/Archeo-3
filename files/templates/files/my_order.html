@@ -1,6 +1,25 @@
 {% extends 'home.html' %}
 
 {% block content %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <!-- {{form.as_p}} -->
+    
+    
+    {% for field in form %}
+    <div class="input-group" id="tr-div">
+        <span class="input-group-text">{{forloop.counter}}</span>
+        {{field}}
+    </div>
+
+    {% endfor %}
+        
+    
+    <input type="submit" value="Submit">
+</form>
+
+
     <h1>Create new custom Order</h1>
     <button onclick="addInput()">Dodaj pole</button>
     <br>

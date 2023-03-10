@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Order, Vehicle, User
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, FormView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.contrib import messages
-from .forms import ReturnForm
+from .forms import ReturnForm, MyOrderForm, MyOrderFormSet
 from django.http import FileResponse
 import io
 # from reportlab.pdfgen import canvas
@@ -33,13 +33,13 @@ def my_order(request):
         post = request.POST
         # list of values from inputs in my_order.html [(tr, comment),..]
         ids = [(post.get('t'+str(i)), post.get('k'+str(i))) for i in range(1, int(post.get('input_counter'))) if post.get('t'+str(i)) != '']
-
-
+        
         for v in ids:
             vehicle = Vehicle.objects.filter(tr=v[0], status='o')
             if vehicle:
-                messages.error(request, "Teczka wypożyczona")
-                return render(request, 'files/my_order.html', {'range': range(1, 11)})
+                messages.error(request, f"{vehicle[0].tr} - Teczka wypożyczona")
+                return redirect(reverse('files:my_order'))
+             
         try:
             user = User.objects.get(pk=1)
             order = Order.objects.create(order_date=timezone.now() ,orderer=user)
@@ -52,6 +52,25 @@ def my_order(request):
     else:
         return render(request, 'files/my_order.html', {'range': range(1, 11)})
     
+class MyOrderView(SuccessMessageMixin, FormView):
+    # form_class = MyOrderForm
+    form_class = MyOrderFormSet
+    template_name = 'files/my_order.html'
+    
+
+    success_url = '/files/orders_to_do/a'
+    success_message = "Wysłano zamówienie"
+
+    def is_valid(self, form):
+        pass
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        # user = User.objects.get(pk=1)
+        # order = Order.objects.create(order_date=timezone.now() ,orderer=user)
+        # Vehicle.objects.bulk_create([Vehicle(tr=x[0], responsible_person=user, order=order, comments=x[1]) for x in ids])
+        return super().form_valid(form)
+    
 
 def orders_to_do(request, status):
     orders = Order.objects.all()
@@ -63,7 +82,7 @@ def orders_to_do(request, status):
 class VehicleUpdateView(UpdateView):
     model = Vehicle
     fields = '__all__'
-    success_url = reverse_lazy('files:orders')
+    success_url = reverse_lazy('files:list')
 
 
 def order_details(request, pk):
@@ -75,7 +94,7 @@ def order_details(request, pk):
             Vehicle.objects.filter(pk=int(id)).update(status='o')
 
         messages.success(request, ("Hurraa!!!"))
-        return redirect('files:orders')
+        return redirect('files:list')
 
     else:
         return render(request, 'files/order_detail.html', context={'order': order})
@@ -87,7 +106,7 @@ class ReturnFormView(SuccessMessageMixin, FormView):
 
     success_url = '/files/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
-
+    
     def form_valid(self, form):
         print(form.cleaned_data)
         Vehicle.objects.filter(tr=form.cleaned_data['tr'], status='o').update(status='r')
