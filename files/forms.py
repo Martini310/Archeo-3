@@ -20,11 +20,23 @@ class ReturnForm(forms.ModelForm):
         # this method didn't change it.
         return data
     
+
 class MyOrderForm(forms.Form):
     tr = forms.CharField(label='', max_length=10, widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 'class': 'form-control'}))
     comments = forms.CharField(label='', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Uwagi', 'class': 'form-control'}))
+
+
+    def clean_tr(self):
+        tr = self.cleaned_data['tr']
+        db = models.Vehicle.objects.filter(tr=tr, status__in='ao')
+        if db:
+            raise ValidationError("Teczka jest już pobrana")
+        return tr
+    
 
     # users = [(a, b) for a, b in enumerate(models.User.objects.all(), start=1)]
     # orderer = forms.ChoiceField(label='Zamawiający', widget=forms.Select, choices=users)
 
 MyOrderFormSet = formset_factory(MyOrderForm, extra=3)
+
+

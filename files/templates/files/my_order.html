@@ -1,23 +1,69 @@
 {% extends 'home.html' %}
 
 {% block content %}
+<button id="add-form" type="button">Dodaj pole</button>
 
-<form action="" method="POST">
+<form id="form-container" method="POST">
     {% csrf_token %}
-    <!-- {{form.as_p}} -->
+    {% comment %} <!-- {{form.as_p}} --> {% endcomment %}
     
-    
-    {% for field in form %}
+    {% comment %} {% for field in form %}
     <div class="input-group" id="tr-div">
         <span class="input-group-text">{{forloop.counter}}</span>
         {{field}}
     </div>
+        {{ field.errors }}
+    {% endfor %} {% endcomment %}
 
+    {{ my_order_formset.management_form }}
+    {% for form in my_order_formset %}
+        <div class="input-group" id="tr-div">
+        <span class="input-group-text">{{forloop.counter}}</span>
+        {% for field in form %}
+            {{field}}
+            
+        {% endfor %}
+        </div>
+        {{ form.errors.tr }}
     {% endfor %}
-        
-    
+
     <input type="submit" value="Submit">
 </form>
+
+
+<script>
+    let birdForm = document.querySelectorAll("#tr-div")
+    let container = document.querySelector("#form-container")
+    let addButton = document.querySelector("#add-form")
+    let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+
+    let formNum = birdForm.length-1
+    addButton.addEventListener('click', addForm)
+
+    function addForm(e){
+        e.preventDefault()
+
+        let newForm = birdForm[0].cloneNode(true)
+        let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+        formNum++
+        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+        container.insertBefore(newForm, addButton)
+        
+        totalForms.setAttribute('value', `${formNum+1}`)
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+{% comment %} 
 
 
     <h1>Create new custom Order</h1>
@@ -36,7 +82,7 @@
             </div>
         {% endfor %}
         <button type="submit" id="submit">Create</button>
-    </form>
+    </form> {% endcomment %}
 
     <br>
  

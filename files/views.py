@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Order, Vehicle, User
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, FormView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, FormView, TemplateView
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.contrib import messages
@@ -14,6 +14,7 @@ import io
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.messages.views import SuccessMessageMixin
+from django.forms import formset_factory
 
 # Create your views here.
 class ListAllVechicles(ListView):
@@ -52,25 +53,54 @@ def my_order(request):
     else:
         return render(request, 'files/my_order.html', {'range': range(1, 11)})
     
-class MyOrderView(SuccessMessageMixin, FormView):
-    # form_class = MyOrderForm
-    form_class = MyOrderFormSet
+# class MyOrderView(SuccessMessageMixin, FormView):
+#     form_class = MyOrderForm
+    
+#     # MyOrderFormSet = formset_factory(MyOrderForm, extra=3)
+#     # formset = MyOrderFormSet
+#     form_class = MyOrderFormSet
+#     template_name = 'files/my_order.html'
+        
+#     success_url = '/files/orders_to_do/a'
+#     success_message = "Wysłano zamówienie"
+
+#     # if formset.is_valid():
+#     #     for form in formset:
+#     #         print(form.cleaned_data)
+
+    
+#     def form_valid(self, form):
+#         print(form.cleaned_data)
+#         # user = User.objects.get(pk=1)
+#         # order = Order.objects.create(order_date=timezone.now() ,orderer=user)
+#         # Vehicle.objects.bulk_create([Vehicle(tr=x[0], responsible_person=user, order=order, comments=x[1]) for x in ids])
+#         return super().form_valid(form)
+    
+
+
+class MyOrderView(TemplateView):
     template_name = 'files/my_order.html'
-    
 
-    success_url = '/files/orders_to_do/a'
-    success_message = "Wysłano zamówienie"
+    def get(self, *args, **kwargs):
+        formset = MyOrderFormSet()
+        return self.render_to_response({'my_order_formset': formset})
 
-    def is_valid(self, form):
-        pass
+    # Define method to handle POST request
+    def post(self, *args, **kwargs):
 
-    def form_valid(self, form):
-        print(form.cleaned_data)
-        # user = User.objects.get(pk=1)
-        # order = Order.objects.create(order_date=timezone.now() ,orderer=user)
-        # Vehicle.objects.bulk_create([Vehicle(tr=x[0], responsible_person=user, order=order, comments=x[1]) for x in ids])
-        return super().form_valid(form)
-    
+        formset = MyOrderFormSet(data=self.request.POST)
+
+        # Check if submitted forms are valid
+        if formset.is_valid():
+            # formset.save()
+            print(formset.cleaned_data)
+            return redirect(reverse_lazy("files:list"))
+
+        return self.render_to_response({'my_order_formset': formset})
+
+
+
+
 
 def orders_to_do(request, status):
     orders = Order.objects.all()
