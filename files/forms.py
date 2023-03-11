@@ -23,7 +23,7 @@ class ReturnForm(forms.ModelForm):
 
 class MyOrderForm(forms.Form):
     tr = forms.CharField(label='', max_length=10, widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 'class': 'form-control'}))
-    comments = forms.CharField(label='', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Uwagi', 'class': 'form-control'}))
+    comments = forms.CharField(label='', max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Uwagi', 'class': 'form-control'}))
 
 
     def clean_tr(self):
@@ -37,6 +37,6 @@ class MyOrderForm(forms.Form):
     # users = [(a, b) for a, b in enumerate(models.User.objects.all(), start=1)]
     # orderer = forms.ChoiceField(label='Zamawiający', widget=forms.Select, choices=users)
 
-MyOrderFormSet = formset_factory(MyOrderForm, extra=3)
+MyOrderFormSet = formset_factory(MyOrderForm, extra=10)
 
 

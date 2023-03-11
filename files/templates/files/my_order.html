@@ -1,24 +1,16 @@
 {% extends 'home.html' %}
 
 {% block content %}
-<button id="add-form" type="button">Dodaj pole</button>
+
 
 <form id="form-container" method="POST">
-    {% csrf_token %}
-    {% comment %} <!-- {{form.as_p}} --> {% endcomment %}
     
-    {% comment %} {% for field in form %}
-    <div class="input-group" id="tr-div">
-        <span class="input-group-text">{{forloop.counter}}</span>
-        {{field}}
-    </div>
-        {{ field.errors }}
-    {% endfor %} {% endcomment %}
+    {% csrf_token %}
 
     {{ my_order_formset.management_form }}
     {% for form in my_order_formset %}
         <div class="input-group" id="tr-div">
-        <span class="input-group-text">{{forloop.counter}}</span>
+        <span class="input-group-text" id="id_form-{{forloop.counter|add:"-1"}}-lp">{{forloop.counter}}</span>
         {% for field in form %}
             {{field}}
             
@@ -26,7 +18,7 @@
         </div>
         {{ form.errors.tr }}
     {% endfor %}
-
+    <button id="add-form" type="button">Dodaj pole</button>
     <input type="submit" value="Submit">
 </form>
 
@@ -49,6 +41,10 @@
         formNum++
         newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
         container.insertBefore(newForm, addButton)
+
+        var lp = 'id_form-'+formNum+'-lp'
+        console.log(lp)
+        document.getElementById(lp).innerHTML = formNum + 1
         
         totalForms.setAttribute('value', `${formNum+1}`)
     }
@@ -64,7 +60,6 @@
 
 
 {% comment %} 
-
 
     <h1>Create new custom Order</h1>
     <button onclick="addInput()">Dodaj pole</button>
@@ -82,7 +77,7 @@
             </div>
         {% endfor %}
         <button type="submit" id="submit">Create</button>
-    </form> {% endcomment %}
+    </form> 
 
     <br>
  
@@ -123,5 +118,6 @@
             counter ++;
         }
     </script>
+    {% endcomment %}
 
 {% endblock content %}

@@ -90,10 +90,15 @@ class MyOrderView(TemplateView):
 
         formset = MyOrderFormSet(data=self.request.POST)
 
+        print(formset.is_valid())
+
         # Check if submitted forms are valid
         if formset.is_valid():
-            # formset.save()
-            print(formset.cleaned_data)
+
+            user = User.objects.get(pk=1)
+            order = Order.objects.create(order_date=timezone.now() ,orderer=user)
+            Vehicle.objects.bulk_create([Vehicle(tr=x['tr'], responsible_person=user, order=order, comments=x['comments']) for x in formset.cleaned_data if x.get('tr') != None])
+
             return redirect(reverse_lazy("files:list"))
 
         return self.render_to_response({'my_order_formset': formset})
