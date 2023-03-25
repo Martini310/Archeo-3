@@ -4,7 +4,6 @@
 
 
 <form id="form-container" method="POST">
-    
     {% csrf_token %}
 
     {{ my_order_formset.management_form }}
@@ -19,11 +18,45 @@
         {{ form.errors.tr }}
     {% endfor %}
     <button id="add-form" type="button">Dodaj pole</button>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" onclick="clicked(event)">
 </form>
 
 
+
+
 <script>
+function clicked(e)
+{
+    /* create a list with values from inputs */
+    const valuesFromInputs = [];
+    let total_forms = document.getElementById("id_form-TOTAL_FORMS").value;
+    for (var x = 0; x < total_forms; x++) {
+        var input_value = document.getElementById('id_form-' + x + '-tr').value;
+        if (input_value.length > 0)
+        {
+            valuesFromInputs.push(input_value);
+        }
+        
+    }
+
+    let trRegex = RegExp('^[A-Z]{1,3}\s[A-Z\d]{3,5}$|^[A-Z]\d\s[A-Z\d]{3,5}$', 'ig');
+    /* Display a confirmation window if any of values from inputs won't fit a pattern */
+    for (let value of valuesFromInputs)
+    {
+        if (value.search(trRegex) == -1) 
+        {
+            if(!confirm('Czy jesteś pewien, że numer rejestracyjny "' + value + '" jest poprawny?')) 
+            {
+                e.preventDefault();
+            }
+        }
+    }
+}
+</script>
+
+
+<script>
+    {% comment %} Adding new fields to formset {% endcomment %}
     let birdForm = document.querySelectorAll("#tr-div")
     let container = document.querySelector("#form-container")
     let addButton = document.querySelector("#add-form")
@@ -49,75 +82,5 @@
         totalForms.setAttribute('value', `${formNum+1}`)
     }
 </script>
-
-
-
-
-
-
-
-
-
-
-{% comment %} 
-
-    <h1>Create new custom Order</h1>
-    <button onclick="addInput()">Dodaj pole</button>
-    <br>
-
-
-    <form method="POST" action="" id="tr">
-        {% csrf_token %}
-        <input type="hidden" name="input_counter" value="11" id="js_data">
-        {% for n in range %}
-            <div class="input-group" id="tr-div">
-                <span class="input-group-text">{{n}}</span>
-                <input type="text" name="t{{n}}" placeholder="nr rejestracyjny" class="form-control">
-                <input type="text" name="k{{n}}" placeholder="uwagi" class="form-control">
-            </div>
-        {% endfor %}
-        <button type="submit" id="submit">Create</button>
-    </form> 
-
-    <br>
- 
-    <script>
-        var counter = 11
-        function addInput() {
-            var formId = document.getElementById('tr');
-
-            var div = document.createElement('div');
-            div.className = 'input-group';
-
-            var span = document.createElement('span')
-            span.className = 'input-group-text';
-            span.textContent = counter;
-
-            var input = document.createElement("input");
-            input.type = 'text';
-            input.name = 't' + counter;
-            input.placeholder = 'nr rejestracyjny';
-            input.className = 'form-control';
-
-            var comment = document.createElement("input");
-            comment.type = 'text';
-            comment.name = 'k' + counter;
-            comment.placeholder = 'uwagi';
-            comment.className = 'form-control';
-
-            var submit = document.createElement("button");
-            submit.type = 'submit';
-            submit.id = 'submit';
-            submit.textContent = 'Create';
-            document.getElementById("submit").remove();
-
-            div.append(span, input, comment);
-            formId.append(div, submit);
-
-            document.getElementById('js_data').value = counter;
-            counter ++;
-        }
-    </script>
-    {% endcomment %}
 
 {% endblock content %}
