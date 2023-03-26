@@ -22,7 +22,7 @@ class ReturnForm(forms.ModelForm):
     
 
 class MyOrderForm(forms.Form):
-    tr = forms.CharField(label='', max_length=10, widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 'class': 'form-control'}))
+    tr = forms.CharField(label='', max_length=10, widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 'class': 'form-control', 'oninput':"handleInput(event)"}))
     comments = forms.CharField(label='', max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Uwagi', 'class': 'form-control'}))
 
 
