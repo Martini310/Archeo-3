@@ -141,7 +141,7 @@ class ReturnFormView(SuccessMessageMixin, FormView):
 
     success_url = '/files/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
-    
+
     def form_valid(self, form):
         print(form.cleaned_data)
         Vehicle.objects.filter(tr=form.cleaned_data['tr'], status='o').update(status='r')
