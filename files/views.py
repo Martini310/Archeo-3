@@ -125,9 +125,13 @@ def order_details(request, pk):
     if request.method == "POST":
         # List of ids from vehicles with checked checkboxes
         id_list = request.POST.getlist('boxes')
-        for id in id_list:
-            Vehicle.objects.filter(pk=int(id)).update(status='o')
-
+        if 'save' in request.POST:
+            for id in id_list:
+                Vehicle.objects.filter(pk=int(id)).update(status='o')
+        elif 'reject' in request.POST:
+            for id in id_list:
+                Vehicle.objects.filter(pk=int(id)).update(status='e')
+        
         messages.success(request, ("Hurraa!!!"))
         return redirect('files:list')
 
@@ -145,7 +149,7 @@ class ReturnFormView(SuccessMessageMixin, FormView):
     def form_valid(self, form):
         print(form.cleaned_data)
         Vehicle.objects.filter(tr=form.cleaned_data['tr'], status='o').update(status='r')
-        
+
         return super().form_valid(form)
     
 
