@@ -6,3 +6,4 @@ poetry.lock
 pyproject.toml
 replit.nix
 db.sqlite3
+static/
