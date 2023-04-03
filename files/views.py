@@ -5,6 +5,8 @@ from django.views.generic import ListView, CreateView, UpdateView, FormView, Tem
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 # from django.http import FileResponse
 # from django.utils.translation import gettext_lazy as _
 from django.contrib.messages.views import SuccessMessageMixin
@@ -31,7 +33,7 @@ class AddVehicle(CreateView):
     success_url = reverse_lazy('files:list')
 
 
-class MyOrderView(SuccessMessageMixin, TemplateView):
+class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """ View to create a new Order. """
     template_name = 'files/my_order.html'
     success_message = "sukces"
@@ -57,6 +59,7 @@ class MyOrderView(SuccessMessageMixin, TemplateView):
         return self.render_to_response({'my_order_formset': formset})
 
 
+@login_required
 def orders_to_do(request, status):
     """ A View with listed all orders divides into status categories. """
     orders = Order.objects.all()

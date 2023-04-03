@@ -22,10 +22,16 @@
               <a class="nav-link" href="/files/orders_to_do/a">Orders to do</a>
               <a class="nav-link" href="/files/return">Return</a>
             </div>
+            <div class="navbar-nav ms-auto"></div>
+              {% if user.is_authenticated %}
+              <button type="button" class="btn btn-outline-warning"><a class="nav-link" href="{% url 'logout' %}">Wyloguj: {{ user.username }}</a></button>
+              {% else %}
+              <button type="button" class="btn btn-outline-warning"><a class="nav-link" href="{% url 'login' %}">Zaloguj</a></button>
+              {% endif %}
+            </div>
           </div>
         </div>
       </nav>
-  
       {% if messages %}
         {% for message in messages %}
         <div class="container-fluid p-0">

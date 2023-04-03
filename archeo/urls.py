@@ -19,6 +19,7 @@ from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('files/', include('files.urls')), 
-  path('', lambda req: redirect("/files/list/")), 
+    path('files/', include('files.urls')),
+    path('', lambda req: redirect("/files/list/")),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
