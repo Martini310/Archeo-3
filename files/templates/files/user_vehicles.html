@@ -1,0 +1,14 @@
+{% extends 'home.html' %}
+
+
+{% block content %}
+    <h1>LIST OF {{ user.get_username }} VEHICLES</h1>
+
+    <ul>
+        {% for vehicle in user_vehicles %}
+            <li>{{ vehicle }} <a href="/files/transfer/{{vehicle.id}}/">przekaż</a></li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}
+    

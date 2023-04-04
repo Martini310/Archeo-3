@@ -5,12 +5,12 @@ from django.views.generic import ListView, CreateView, UpdateView, FormView, Tem
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 # from django.http import FileResponse
 # from django.utils.translation import gettext_lazy as _
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import ReturnForm, MyOrderFormSet
+from .forms import ReturnForm, MyOrderFormSet, TransferForm
 from .models import Order, Vehicle, User
 # from reportlab.pdfgen import canvas
 # from reportlab.lib.units import inch
@@ -26,7 +26,7 @@ class ListAllVechicles(ListView):
     context_object_name = 'vehicle_list'
 
 
-class AddVehicle(CreateView):
+class AddVehicle(LoginRequiredMixin, CreateView):
     """ A View to create a new instance of vehicle. """
     model = Vehicle
     fields = "__all__"
@@ -52,8 +52,12 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
             if any(len(row) > 0 for row in formset.cleaned_data):
                 user = User.objects.get(pk=1)
                 order = Order.objects.create(order_date=timezone.now(), orderer=user)
-                Vehicle.objects.bulk_create([Vehicle(tr=row['tr'], responsible_person=user, order=order,
-                                            comments=row['comments']) for row in formset.cleaned_data if row.get('tr') is not None])
+                Vehicle.objects.bulk_create([Vehicle(tr=row['tr'], 
+                                                     transfer_date=timezone.now(), 
+                                                     responsible_person=user, 
+                                                     order=order,
+                                                     comments=row['comments']) 
+                                                     for row in formset.cleaned_data if row.get('tr') is not None])
                 messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
                 return redirect(reverse_lazy("files:list"))
         return self.render_to_response({'my_order_formset': formset})
@@ -69,13 +73,14 @@ def orders_to_do(request, status):
     return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
 
 
-class VehicleUpdateView(UpdateView):
+class VehicleUpdateView(LoginRequiredMixin, UpdateView):
     """ A View to update particular Vehicle - url:'update/<int:pk>/' """
     model = Vehicle
     fields = '__all__'
     success_url = reverse_lazy('files:list')
 
 
+@login_required
 def order_details(request, pk):
     """ A View to update particular Order, Save or Reject Vehicles in Order - url:'order_details/<int:pk>/' """
     order = Order.objects.get(pk=pk)
@@ -96,7 +101,7 @@ def order_details(request, pk):
         return render(request, 'files/order_detail.html', context={'order': order})
 
 
-class ReturnFormView(SuccessMessageMixin, FormView):
+class ReturnFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     """ A View to return a vehicle. """
     form_class = ReturnForm
     template_name = 'files/return.html'
@@ -110,6 +115,25 @@ class ReturnFormView(SuccessMessageMixin, FormView):
             tr=form.cleaned_data['tr'], status='o').update(status='r')
 
         return super().form_valid(form)
+
+
+class ListUserVehiclesView(LoginRequiredMixin, ListView):
+    """ List all vehicles that currently logged user is responsible for. """
+    model = Vehicle
+    context_object_name = 'user_vehicles'
+    template_name = 'files/user_vehicles.html'
+    
+    def get_queryset(self):
+        return Vehicle.objects.filter(responsible_person=self.request.user).all()
+
+
+class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+    """ Update View to change the person responsible for vehicle file."""
+    model = Vehicle
+    form_class = TransferForm
+    success_url = reverse_lazy('files:user_list')
+    success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
+    permission_required = 'files.change_vehicle'
 
 
 # def gen_pdf(request, pk):

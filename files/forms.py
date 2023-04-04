@@ -52,3 +52,12 @@ class MyOrderForm(forms.Form):
 
 
 MyOrderFormSet = formset_factory(MyOrderForm, extra=10)
+
+
+class TransferForm(forms.ModelForm):
+    tr = forms.CharField(max_length=8, disabled=True)
+    transfer_date = forms.DateField(disabled=True)
+
+    class Meta:
+        model = models.Vehicle
+        fields = ['tr', 'transfer_date', 'responsible_person', 'comments']

@@ -21,6 +21,9 @@
               <a class="nav-link" href={% url "files:my_order" %}>My Order</a>
               <a class="nav-link" href="/files/orders_to_do/a">Orders to do</a>
               <a class="nav-link" href="/files/return">Return</a>
+              {% if user.is_authenticated %}
+              <a class="nav-link" href="/files/user_list">Moje teczki</a>
+              {% endif %}
             </div>
             <div class="navbar-nav ms-auto"></div>
               {% if user.is_authenticated %}
