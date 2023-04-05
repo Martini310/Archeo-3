@@ -1,12 +1,16 @@
 {% extends 'home.html' %}
 
-
 {% block content %}
     <h1>LIST OF {{ user.get_username }} VEHICLES</h1>
 
     <ul>
-        {% for vehicle in user_vehicles %}
-            <li>{{ vehicle }} <a href="/files/transfer/{{vehicle.id}}/">przekaż</a></li>
+        {% for order in orders %}
+            <li>Zamówienie: {{ order.id }}</li>
+            {% for vehicle in order.vehicles.all %}
+                {% if vehicle.responsible_person.username == user.get_username %}
+                    <li>{{ vehicle }} <a href="/files/transfer/{{vehicle.id}}/">przekaż</a></li>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
     </ul>
 

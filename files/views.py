@@ -120,11 +120,11 @@ class ReturnFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
 class ListUserVehiclesView(LoginRequiredMixin, ListView):
     """ List all vehicles that currently logged user is responsible for. """
     model = Vehicle
-    context_object_name = 'user_vehicles'
+    context_object_name = 'orders' # 'user_vehicles'
     template_name = 'files/user_vehicles.html'
     
     def get_queryset(self):
-        return Vehicle.objects.filter(responsible_person=self.request.user).all()
+        return Order.objects.all()
 
 
 class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
