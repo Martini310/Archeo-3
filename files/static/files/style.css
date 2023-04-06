@@ -1,0 +1,26 @@
+@media print {
+    /* hide everything except the content you want to print */
+    body * {
+      visibility: hidden;
+    }
+    .print-section, .print-section * {
+      visibility: visible;
+    }
+    .btn-success, .btn-success * {
+        visibility: hidden;
+    }
+    .btn-danger, .btn-danger * {
+        visibility: hidden;
+    }
+    /* adjust styles for printing */
+    .print-section {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }
+
+h2 {
+    color: chartreuse;
+}

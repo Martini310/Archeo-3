@@ -4,7 +4,7 @@
     <h1>LIST OF {{ user.get_username }} VEHICLES</h1>
 
     <ul>
-        {% for order in orders %}
+        {% for order in orders %}          
             <li>Zamówienie: {{ order.id }}</li>
             {% for vehicle in order.vehicles.all %}
                 {% if vehicle.responsible_person.username == user.get_username %}

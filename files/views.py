@@ -124,7 +124,9 @@ class ListUserVehiclesView(LoginRequiredMixin, ListView):
     template_name = 'files/user_vehicles.html'
     
     def get_queryset(self):
-        return Order.objects.all()
+        # Get list of orders where at least in one vehicle user is a responsible person
+        orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == self.request.user.get_username() for vehicle in order.vehicles.all())]
+        return orders
 
 
 class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):

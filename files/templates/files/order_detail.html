@@ -1,67 +1,52 @@
 {% extends 'home.html' %}
 
 {% block content %}
-    {{order}}
+
+<div class="print-section">
+    <h2>{{order}}</h2>
     
-<form action="" method="post">
-{% csrf_token %}
+    <form action="" method="post">
+        {% csrf_token %}
 
-<div id="to-print">
-    <div>
-<table class="table table-striped table-hover table-bordered">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Nr rejestracyjny</th>
-        <th scope="col">Status</th>
-        <th scope="col"><input class="form-check-input" type="checkbox" value="Select All" onclick="selectAll(this)" id="TestAll" /> check</th>
-      </tr>
-    </thead>
-    <tbody>
-
-        {% for vehicle in order.vehicles.all %}
-        <tr>
-            <th scope="row">{{forloop.counter}}</th>
-            <td>{{vehicle.tr}}</td>
-            <td>{{vehicle.status}}</td>
-            <td>
-            {% if event.approved %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll">
-                </div>
-                {% else %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll">
-                </div>
-            {% endif %}
-                </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-  </table>
-</div><a href="#" onclick="printInfo(this)">Print</a>
+        <table class="table table-striped table-hover table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nr rejestracyjny</th>
+                <th scope="col">Status</th>
+                <th scope="col"><input class="form-check-input" type="checkbox" value="Select All" onclick="selectAll(this)" id="TestAll" /> check</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for vehicle in order.vehicles.all %}
+                <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <td>{{vehicle.tr}}</td>
+                    <td>{{vehicle.status}}</td>
+                    <td>
+                        {% if event.approved %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll">
+                            </div>
+                            {% else %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll">
+                            </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <br/>
+        <button class="btn btn-success" name='save' type="submit">Save</button>
+        <button class="btn btn-danger" name='reject' type="submit">Reject</button>
+    </form>
 </div>
-
-  <br/>
-  <button class="btn btn-success" name='save' type="submit">Save</button>
-  <button class="btn btn-danger" name='reject' type="submit">Reject</button>
-</form>
-
 
 <button class="btn btn-primary" onclick="window.print()">Drukuj</button>
 
-
-
-<script>
-    function printInfo(ele) {
-        var openWindow = window.open("", "title", "attributes");
-        openWindow.document.write(ele.previousSibling.innerHTML);
-        openWindow.document.close();
-        openWindow.focus();
-        openWindow.print();
-        openWindow.close();
-    }
-</script>
 
 <script>
     function selectAll(checkBox) {
