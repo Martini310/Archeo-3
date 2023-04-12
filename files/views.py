@@ -125,8 +125,14 @@ class ListUserVehiclesView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         # Get list of orders where at least in one vehicle user is a responsible person
+        abr = Vehicle.LOAN_STATUS
         orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == self.request.user.get_username() for vehicle in order.vehicles.all())]
-        return orders
+        return [orders, abr]
+
+    def get(self, request, status='aore'):
+        orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == request.user.get_username() and vehicle.status in status for vehicle in order.vehicles.all())]
+        context = {'orders': (orders, Vehicle.LOAN_STATUS, status)}
+        return render(request, 'files/user_vehicles.html', context)
 
 
 class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):

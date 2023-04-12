@@ -3,11 +3,20 @@
 {% block content %}
     <h1>LIST OF {{ user.get_username }} VEHICLES</h1>
 
+    <div class="btn-group"></div>
+    <a href="/files/user_list/" class="btn btn-primary">Wszystkie</a>
+    {% for s, n in orders.1 %}
+        
+        <a href="/files/user_list/{{s}}" class="btn btn-primary">{{n}}</a>
+        
+    {% endfor %}
+    </div>
+
     <ul>
-        {% for order in orders %}          
+        {% for order in orders.0 %}          
             <li>Zamówienie: {{ order.id }}</li>
             {% for vehicle in order.vehicles.all %}
-                {% if vehicle.responsible_person.username == user.get_username %}
+                {% if vehicle.responsible_person.username == user.get_username and vehicle.status in orders.2 %}
                     <li>{{ vehicle }} <a href="/files/transfer/{{vehicle.id}}/">przekaż</a></li>
                 {% endif %}
             {% endfor %}
@@ -15,4 +24,3 @@
     </ul>
 
 {% endblock content %}
-    
