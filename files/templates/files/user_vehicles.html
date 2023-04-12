@@ -12,15 +12,42 @@
     {% endfor %}
     </div>
 
-    <ul>
-        {% for order in orders.0 %}          
-            <li>Zamówienie: {{ order.id }}</li>
+    <div class='container'>
+    <table class="table table-xl table-dark table-striped table-hover mx-auto">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Numer Rejestracyjny</th>
+                <th>Pobrał</th>
+                <th>Data Pobrania</th>
+                <th>Status</th>
+                <th>Przekaż</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in orders.0 %}  
+            <tr>
+                <th colspan='6'>Zamówienie: {{ order.id }}</th>
+            </tr>
+            
             {% for vehicle in order.vehicles.all %}
+            <tr>
                 {% if vehicle.responsible_person.username == user.get_username and vehicle.status in orders.2 %}
-                    <li>{{ vehicle }} <a href="/files/transfer/{{vehicle.id}}/">przekaż</a></li>
-                {% endif %}
+                <td class="mx-auto">{{ vehicle.id }}</td>
+                <td class="mx-auto">{{ vehicle.tr }}</td>
+                <td>{{ vehicle.responsible_person.username }}</td>
+                <td>{{ vehicle.transfer_date }}</td>
+                <td>{{ vehicle.status|upper }}</td>
+                <td>{% if vehicle.status == 'o' %}
+                    <button class='btn btn-primary'><a href="/files/transfer/{{vehicle.id}}/"></a>Przekaż</button>
+                    {% else %}---
+                    {% endif %}
+                </td>
+                {% endif %}{% endfor %}
+            </tr>
             {% endfor %}
-        {% endfor %}
-    </ul>
+        </tbody>
+    </table>
+    </div>
 
 {% endblock content %}
