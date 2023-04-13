@@ -7,7 +7,7 @@
 </div> {% endcomment %}
 
 <div id="search-results" class='container'>
-    <table class="table table-xl table-dark table-striped table-hover mx-auto">
+    <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
         <thead>
             <tr>
                 <th>ID</th>
@@ -34,7 +34,7 @@
                 
             
                 <td>{{ vehicle.id }}</td>
-                <td>{{ vehicle.tr }}</td>
+                <td class="fw-bolder">{{ vehicle.tr }}</td>
                 <td>{{ vehicle.responsible_person.username }}</td>
                 <td>{{ vehicle.transfer_date }}</td>
                 <td>{{ vehicle.status|upper }}</td>

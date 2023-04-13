@@ -3,17 +3,19 @@
 {% block content %}
     <h1>LIST OF {{ user.get_username }} VEHICLES</h1>
 
-    <div class="btn-group"></div>
-    <a href="/files/user_list/" class="btn btn-primary">Wszystkie</a>
-    {% for s, n in orders.1 %}
-        
-        <a href="/files/user_list/{{s}}" class="btn btn-primary">{{n}}</a>
-        
-    {% endfor %}
+    <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
+        <a href="/files/user_list/" class="btn btn-primary">Wszystkie</a>
+        {% for s, n in orders.1 %}
+            {% if request.path|stringformat:'s'|slice:'-2:-1' == s %}
+                <a href="/files/user_list/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
+            {% else %}
+                <a href="/files/user_list/{{s}}" class="btn btn-primary">{{n}}</a>
+            {% endif %}
+        {% endfor %}
     </div>
 
     <div class='container'>
-    <table class="table table-xl table-dark table-striped table-hover mx-auto">
+    <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
         <thead>
             <tr>
                 <th>ID</th>
@@ -27,7 +29,7 @@
         <tbody>
         {% for order in orders.0 %}  
             <tr>
-                <th colspan='6'>Zamówienie: {{ order.id }}</th>
+                <th class="text-start" colspan='6'>Zamówienie: {{ order.id }}</th>
             </tr>
             
             {% for vehicle in order.vehicles.all %}
