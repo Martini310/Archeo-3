@@ -39,7 +39,7 @@
                 <td>{{ vehicle.transfer_date }}</td>
                 <td>{{ vehicle.status|upper }}</td>
                 <td>{% if vehicle.status == 'o' %}
-                    <button class='btn btn-primary'><a href="/files/transfer/{{vehicle.id}}/"></a>Przekaż</button>
+                    <a class='btn btn-primary'href="/files/transfer/{{vehicle.id}}/">Przekaż</a>
                     {% else %}---
                     {% endif %}
                 </td>

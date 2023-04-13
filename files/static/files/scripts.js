@@ -9,8 +9,7 @@ function handleInput(e) {
     }
 
 
-function clicked(e)
-{
+function clicked(e){
     // create a list with values from inputs
     const valuesFromInputs = [];
     let total_forms = document.getElementById("id_form-TOTAL_FORMS").value;
@@ -37,16 +36,8 @@ function clicked(e)
 }
 
 
-// Adding new fields to formset
-let birdForm = document.querySelectorAll("#tr-div")
-let container = document.querySelector("#form-container")
-let addButton = document.querySelector("#add-form")
-let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
-
-let formNum = birdForm.length-1
-addButton.addEventListener('click', addForm)
-
 function addForm(e){
+    // Add new fields to formset
     e.preventDefault()
 
     let newForm = birdForm[0].cloneNode(true)
@@ -62,3 +53,4 @@ function addForm(e){
     
     totalForms.setAttribute('value', `${formNum+1}`)
 }
+    

@@ -1,14 +1,44 @@
 {% extends 'home.html' %}
-
+{% load static %}
 {% block content %}
 
     <h1>LIST OF ALL VEHICLES</h1>
     
-    <ul>
-        {% for car in vehicle_list %}
-            <li>{{car}} <a href="/files/update/{{car.id}}/">edytuj</a></li>
-        {% endfor %}
-    </ul>
+    <form 
+        hx-get="{% url 'files:search' %}"
+        hx-target="#search-results"
+        hx-swap="outerHTML"
+        hx-trigger="submit, input delay:0.3s"
+        >
+            <input type="text" name="search" placeholder="Szukaj..." value="{{ search }}">
 
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="">---</option>
+                <option value="r">Zwrócone</option>
+                <option value="e">Odrzucone</option>
+                <option value="o">Pobrane</option>
+                <option value="a">Oczekujące</option>
+            </select> 
+
+
+            <label for="user">Pobrał:</label>
+            <select id="user" name="user">
+                <option value="">---</option>
+                {% for user in users %}
+                    <option value={{ user.id }}>{{ user.username }}</option>
+                {% endfor %}
+                    
+            </select> 
+
+    </form>
+
+    {% include 'files/search_results.html' %}
+        <script type="text/javascript" src="{% static 'files/htmx.min.js' %}"></script>
+        <script>
+            document.body.addEventListener('htmx:configRequest', (event) => {
+                event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+            })
+        </script>
 {% endblock content %}
     

@@ -24,6 +24,34 @@ class ListAllVechicles(ListView):
     model = Vehicle
     template_name = 'files/list.html'
     context_object_name = 'vehicle_list'
+    
+
+def list_view(request):
+    vehicles, search = _search_vehicles(request)
+    users = User.objects.all()
+    context = {'vehicle_list': vehicles, 'search': search or "", 'users': users}
+    return render(request, "files/list.html", context)
+
+
+def search_view(request):
+    vehicles, search = _search_vehicles(request)
+    context = {'vehicle_list': vehicles, 'search': search or ""}
+    return render(request, "files/search_results.html", context)
+
+
+def _search_vehicles(request):
+    search = request.GET.get("search")
+    status = request.GET.get("status")
+    user = request.GET.get("user")
+    vehicles = Vehicle.objects.all()
+
+    if search:
+        vehicles = vehicles.filter(tr__icontains=search)
+    if status:
+        vehicles = vehicles.filter(status=status)
+    if user:
+        vehicles = vehicles.filter(responsible_person=user)
+    return vehicles, search or ""
 
 
 class AddVehicle(LoginRequiredMixin, CreateView):
@@ -142,39 +170,3 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
     success_url = reverse_lazy('files:user_list')
     success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
     permission_required = 'files.change_vehicle'
-
-
-# def gen_pdf(request, pk):
-#     # Create Bytestream buffer
-#     buf = io.BytesIO()
-#     # Create a canvas
-#     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
-#     # Create a text object
-#     textob = c.beginText()
-#     textob.setTextOrigin(inch, inch)
-#     textob.setFont("Helvetica", 14)
-
-#     order = Order.objects.get(pk=pk)
-
-#     # Add some lines of text
-#     lines = [
-#         "This is line 1",
-#         "This is line 2",
-#         "This is line 3"
-#     ]
-
-#     for v in order.vehicles.all():
-#         lines.append(v.tr)
-#         lines.append(v.status)
-
-#     # loop
-#     for line in lines:
-#         textob.textLine(line)
-
-#     # Finish Up
-#     c.drawText(textob)
-#     c.showPage()
-#     c.save()
-#     buf.seek(0)
-
-#     return FileResponse(buf, as_attachment=True, filename='test.pdf')
