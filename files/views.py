@@ -137,10 +137,23 @@ class ReturnFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     success_url = '/files/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        
+        # Retrieve the value of 'returner' from the session
+        returner_pk = self.request.session.get('returner')
+        if returner_pk:
+            returner = User.objects.get(pk=returner_pk)
+            kwargs['initial'] = {'returner': returner}
+        
+        return kwargs
+
     def form_valid(self, form):
-        print(form.cleaned_data)
         Vehicle.objects.filter(
             tr=form.cleaned_data['tr'], status='o').update(status='r')
+
+        # Store the value of 'returner' in the session
+        self.request.session['returner'] = form.cleaned_data['returner'].pk
 
         return super().form_valid(form)
 
