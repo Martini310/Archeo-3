@@ -4,6 +4,19 @@
     <h1>LIST OF {{ user.get_username }} VEHICLES</h1>
 
     <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
+    {% if orders.3 %}
+    Inni użytkownicy przekazują Ci teczki: 
+    <button type="button" class="btn btn-primary position-relative">
+        Odbierz
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          {{ orders.3.count }}
+          <span class="visually-hidden">unread messages</span>
+        </span>
+      </button>
+    {% endif %}
+    </div>
+
+    <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
         <a href="/files/user_list/" class="btn btn-primary">Wszystkie</a>
         {% for s, n in orders.1 %}
             {% if request.path|stringformat:'s'|slice:'-2:-1' == s %}

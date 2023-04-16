@@ -172,7 +172,8 @@ class ListUserVehiclesView(LoginRequiredMixin, ListView):
 
     def get(self, request, status='aore'):
         orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == request.user.get_username() and vehicle.status in status for vehicle in order.vehicles.all())]
-        context = {'orders': (orders, Vehicle.LOAN_STATUS, status)}
+        transfers = Vehicle.objects.filter(transfering_to=self.request.user)
+        context = {'orders': (orders, Vehicle.LOAN_STATUS, status, transfers)}
         return render(request, 'files/user_vehicles.html', context)
 
 

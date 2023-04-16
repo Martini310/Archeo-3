@@ -16,6 +16,7 @@ class Vehicle(models.Model):
     transfer_date = models.DateTimeField(blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     responsible_person = models.ForeignKey(User, related_name="vehicles", on_delete=models.RESTRICT)
+    transfering_to = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='transfering', blank=True, null=True)
     comments = models.CharField(max_length=100, null=True, blank=True)
     LOAN_STATUS = (
         ('a', 'Awaits'), 

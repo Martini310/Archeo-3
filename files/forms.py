@@ -60,4 +60,4 @@ class TransferForm(forms.ModelForm):
 
     class Meta:
         model = models.Vehicle
-        fields = ['tr', 'transfer_date', 'responsible_person', 'comments']
+        fields = ['tr', 'transfer_date', 'transfering_to', 'comments']
