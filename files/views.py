@@ -18,6 +18,21 @@ from .models import Order, Vehicle, User
 
 # Create your views here.
 
+def notification_context(request):
+    """Context dictionary for all templates in app"""
+    # look up the notifications for the current user
+    transfers = Vehicle.objects.filter(transfering_to=request.user.id)
+    # The return value must be a dict, and any values in that dict
+    # are added to the template context for all templates.        
+    # You might want to use more unique names here, to avoid having these
+    # variables clash with variables added by a view.  For example, `count` could easily
+    # be used elsewhere.
+    return {'notifications': {'data': transfers,}}
+
+
+class HomeView(TemplateView):
+    template_name = "home.html"
+    
 
 class ListAllVechicles(ListView):
     """ A View with listed all vehicles in DB. """
@@ -163,12 +178,6 @@ class ListUserVehiclesView(LoginRequiredMixin, ListView):
     model = Vehicle
     context_object_name = 'orders' # 'user_vehicles'
     template_name = 'files/user_vehicles.html'
-    
-    def get_queryset(self):
-        # Get list of orders where at least in one vehicle user is a responsible person
-        abr = Vehicle.LOAN_STATUS
-        orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == self.request.user.get_username() for vehicle in order.vehicles.all())]
-        return [orders, abr]
 
     def get(self, request, status='aore'):
         orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == request.user.get_username() and vehicle.status in status for vehicle in order.vehicles.all())]
@@ -184,3 +193,19 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
     success_url = reverse_lazy('files:user_list')
     success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
     permission_required = 'files.change_vehicle'
+
+
+class AcceptTransferVehicleView(ListView):
+    template_name = 'files/accept_vehicles.html'
+    context_object_name = 'transfers'
+
+    def get_queryset(self):
+        queryset = Vehicle.objects.filter(transfering_to=self.request.user)
+        return queryset
+
+
+def update_status(request, pk):
+    if request.method == "POST":
+        Vehicle.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
+        return redirect(reverse_lazy('files:user_list'))
+    

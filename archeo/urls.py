@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
+from files import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('files/', include('files.urls')),
-    path('', lambda req: redirect("/files/list/")),
+    path('', views.HomeView.as_view()),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

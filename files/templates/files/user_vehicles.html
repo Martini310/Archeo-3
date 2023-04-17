@@ -6,13 +6,13 @@
     <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
     {% if orders.3 %}
     Inni użytkownicy przekazują Ci teczki: 
-    <button type="button" class="btn btn-primary position-relative">
+    <a href={% url 'files:accept_vehicles' %}><button type="button" class="btn btn-primary position-relative" >
         Odbierz
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           {{ orders.3.count }}
           <span class="visually-hidden">unread messages</span>
         </span>
-      </button>
+      </button></a>
     {% endif %}
     </div>
 

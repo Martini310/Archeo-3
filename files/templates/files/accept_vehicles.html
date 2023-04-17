@@ -1,0 +1,21 @@
+{% extends 'home.html' %}
+
+
+{% block content %}
+
+    {% for vehicle in transfers %}
+
+    
+        <form action={% url 'files:accept' vehicle.id %} method=POST>
+            {% csrf_token %}
+            {{ vehicle }}<br>
+            <button id="approve-btn" type="submit">Approve</button>
+        </form>
+
+        
+    {% endfor %}
+
+{% endblock content %}
+    
+
+    
