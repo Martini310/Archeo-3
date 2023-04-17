@@ -204,8 +204,14 @@ class AcceptTransferVehicleView(ListView):
         return queryset
 
 
-def update_status(request, pk):
+def update_transfer_status_view(request, pk):
+    """A View to handle accept/reject file transfer in AcceptTransferVehicleView"""
     if request.method == "POST":
-        Vehicle.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
+        if 'accept' in request.POST:
+            Vehicle.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
+        elif 'reject' in request.POST:
+            Vehicle.objects.filter(id=pk).update(transfering_to=None)
+
         return redirect(reverse_lazy('files:user_list'))
+    
     

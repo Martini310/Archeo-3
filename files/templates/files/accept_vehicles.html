@@ -9,7 +9,8 @@
         <form action={% url 'files:accept' vehicle.id %} method=POST>
             {% csrf_token %}
             {{ vehicle }}<br>
-            <button id="approve-btn" type="submit">Approve</button>
+            <button class="btn btn-success" name='accept' type="submit">Przyjmij</button>
+            <button class="btn btn-danger" name='reject' type="submit">Odrzuć</button>
         </form>
 
         
