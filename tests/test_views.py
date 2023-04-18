@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
-
+from django.utils import timezone
 from files.models import Order, Vehicle
 from files.forms import MyOrderFormSet
 
@@ -51,3 +51,52 @@ class MyOrderViewTest(TestCase):
         self.assertEqual(response.status_code, 200) # Check if response is successful
         self.assertTemplateUsed(response, 'files/my_order.html') # Check if the correct template is used
         self.assertIsInstance(response.context['my_order_formset'], MyOrderFormSet) # Check if the formset is passed to the template
+
+
+class OrdersToDoViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user2 = User.objects.create_user(username='testuser2', password='testpass')
+
+        self.order_a = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+        self.order_o = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+        self.order_r = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+        self.order_e = Order.objects.create(order_date=timezone.now(), orderer=self.user2)
+
+        self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='a', order=self.order_a)
+        self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='a', order=self.order_a)
+
+        self.vehicle3_o = Vehicle.objects.create(tr='ABC C123', responsible_person=self.user, status='o', order=self.order_o)
+        self.vehicle4_o = Vehicle.objects.create(tr='XYC Z789', responsible_person=self.user, status='o', order=self.order_o)
+
+        self.vehicle5_r = Vehicle.objects.create(tr='AB A123', responsible_person=self.user, status='r', order=self.order_r)
+        self.vehicle6_r = Vehicle.objects.create(tr='XY A789', responsible_person=self.user, status='r', order=self.order_r)
+
+        self.vehicle7_e = Vehicle.objects.create(tr='AB D123', responsible_person=self.user2, status='e', order=self.order_e)
+        self.vehicle8_e = Vehicle.objects.create(tr='XY D789', responsible_person=self.user2, status='e', order=self.order_e)
+
+        self.url = reverse('files:orders_to_do', args=['a'])
+
+    def test_view_requires_login(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=' + self.url)
+
+    def test_view_displays_orders_with_specified_status(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'files/orders_to_do.html')
+        self.assertContains(response, 'Zamówienie nr {}'.format(self.order_a.id))
+        self.assertContains(response, 'Liczba teczek 2')
+        self.assertContains(response, self.user.username)
+
+    def test_view_does_not_display_orders_with_different_status(self):
+        self.client.login(username='testuser', password='testpass')
+        url = reverse('files:orders_to_do', args=['e'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'files/orders_to_do.html')
+        self.assertContains(response, 'Zamówienie nr {}'.format(self.order_e.id))
+        self.assertContains(response, 'Liczba teczek 2')
+        self.assertContains(response, self.user.username)
