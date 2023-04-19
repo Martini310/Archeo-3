@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -56,7 +57,7 @@ class MyOrderViewTest(TestCase):
 class OrdersToDoViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.user2 = User.objects.create_user(username='testuser2', password='testpass')
+        self.user2 = User.objects.create_user(username='usertest', password='testpass')
 
         self.order_a = Order.objects.create(order_date=timezone.now(), orderer=self.user)
         self.order_o = Order.objects.create(order_date=timezone.now(), orderer=self.user)
@@ -87,9 +88,12 @@ class OrdersToDoViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'files/orders_to_do.html')
-        self.assertContains(response, 'Zamówienie nr {}'.format(self.order_a.id))
-        self.assertContains(response, 'Liczba teczek 2')
+        self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
+        self.assertContains(response, 'Do realizacji: 2')
         self.assertContains(response, self.user.username)
+        self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
 
     def test_view_does_not_display_orders_with_different_status(self):
         self.client.login(username='testuser', password='testpass')
@@ -97,6 +101,9 @@ class OrdersToDoViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'files/orders_to_do.html')
-        self.assertContains(response, 'Zamówienie nr {}'.format(self.order_e.id))
-        self.assertContains(response, 'Liczba teczek 2')
+        self.assertContains(response, f'Zamówienie nr {self.order_e.id}')
+        self.assertContains(response, 'Liczba teczek ogółem: 2')
         self.assertContains(response, self.user.username)
+        self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_a.id}')

@@ -110,7 +110,7 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
 def orders_to_do(request, status):
     """ A View with listed all orders divides into status categories. """
     orders = Order.objects.all()
-    orders = [order for order in orders if any(
+    orders = [(order, order.vehicles.filter(status='a').count) for order in orders if any(
         [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == status])]
     abr = Vehicle.LOAN_STATUS
     return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})

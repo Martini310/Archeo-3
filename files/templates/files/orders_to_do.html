@@ -6,7 +6,7 @@
 
 <div class="btn-group"></div>
     {% for s, n in abr %}
-        {% if request.path|stringformat:'s'|slice:'-2:-1' == s %}
+        {% if status == s %}
             <a href="/files/orders_to_do/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
         {% else %}
             <a href="/files/orders_to_do/{{s}}" class="btn btn-primary">{{n}}</a>
@@ -19,9 +19,10 @@
     {% for order in orders %}
     <tr>
     <td>{{forloop.counter}}</td>
-    <td><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></td>
-    <td>Liczba teczek {{order.vehicles.all.count}}</td>
-    <td>{{order.orderer}}</td>
+    <td><a href="/files/order_details/{{order.0.id}}/">Zamówienie nr {{order.0.id}}</a></td>
+    <td>Do realizacji: {{order.1}}</td>
+    <td>Liczba teczek ogółem: {{ order.0.vehicles.all.count }}</td>
+    <td>{{order.0.orderer}}</td>
     </tr>
     {% endfor %}
 </table>
