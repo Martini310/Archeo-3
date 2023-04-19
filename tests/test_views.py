@@ -47,6 +47,21 @@ class MyOrderViewTest(TestCase):
         self.assertEqual(vehicle_2.order, order)
         self.assertEqual(vehicle_2.comments, 'Test comment 2')
 
+    def test_my_order_view_post_empty_form(self):
+        # Create test data for the formset
+        formset_data = {
+            'form-TOTAL_FORMS': '10',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000'
+        }
+
+        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        self.assertEqual(response.status_code, 200) # Check if response is a page refresh
+
+        # Check if a new order and vehicles haven't been created
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(Vehicle.objects.count(), 0)
+
     def test_my_order_view_get(self):
         response = self.client.get(reverse('files:my_order'))
         self.assertEqual(response.status_code, 200) # Check if response is successful
@@ -90,6 +105,8 @@ class OrdersToDoViewTest(TestCase):
         self.assertTemplateUsed(response, 'files/orders_to_do.html')
         self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
         self.assertContains(response, 'Do realizacji: 2')
+        self.assertContains(response, 'Liczba teczek ogółem: 2')
+
         self.assertContains(response, self.user.username)
         self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
         self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
@@ -102,8 +119,51 @@ class OrdersToDoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'files/orders_to_do.html')
         self.assertContains(response, f'Zamówienie nr {self.order_e.id}')
+        self.assertContains(response, 'Do realizacji: 0')
         self.assertContains(response, 'Liczba teczek ogółem: 2')
         self.assertContains(response, self.user.username)
         self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
         self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
         self.assertNotContains(response, f'Zamówienie nr {self.order_a.id}')
+
+    def test_view_properly_count_files_with_different_status(self):
+        self.client.login(username='testuser', password='testpass')
+        
+        Vehicle.objects.filter(pk=3).update(order=self.order_a)
+        Vehicle.objects.filter(pk=5).update(order=self.order_a)
+        Vehicle.objects.filter(pk=7).update(order=self.order_a)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
+        self.assertContains(response, 'Do realizacji: 2')
+        self.assertContains(response, 'Liczba teczek ogółem: 5')
+
+        self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
+
+class OrderDetailsViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+
+        self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+
+        self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='a', order=self.order)
+        self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
+
+        self.url = reverse('files:order_details', args=['1'])
+
+    def test_view_requires_login(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=' + self.url)
+
+    def test_view_display_all_files(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertRegex('asfa<td>o</td>s', r"<td>o</td>")
+
+
