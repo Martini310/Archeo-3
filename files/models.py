@@ -30,3 +30,8 @@ class Vehicle(models.Model):
 
     def __str__(self) -> str:
         return f"{self.tr}, POBRAŁ: {self.responsible_person}, STATUS: {self.status}, ZAMÓWIENIE: {self.order.id}"
+
+    class Meta:
+        permissions = [
+            ("can_return", "Can return files"),
+        ]

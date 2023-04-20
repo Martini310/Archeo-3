@@ -1,5 +1,6 @@
 # pylint: disable=no-member
 # import io
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView
 from django.urls import reverse_lazy
@@ -144,10 +145,11 @@ def order_details(request, pk):
         return render(request, 'files/order_detail.html', context={'order': order})
 
 
-class ReturnFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):
     """ A View to return a vehicle. """
     form_class = ReturnForm
     template_name = 'files/return.html'
+    permission_required = 'files.can_return'
 
     success_url = '/files/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
@@ -193,6 +195,13 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
     success_url = reverse_lazy('files:user_list')
     success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
     permission_required = 'files.change_vehicle'
+
+    def dispatch(self, request, *args, **kwargs):
+        handler = super(TransferVehicleView, self).dispatch(request, *args, **kwargs)
+        # Only allow editing if current user is owner
+        if self.object.responsible_person != request.user:
+            return HttpResponseForbidden(u"Can't touch this.")
+        return handler
 
 
 class AcceptTransferVehicleView(ListView):
