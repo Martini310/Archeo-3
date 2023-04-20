@@ -164,6 +164,9 @@ class OrderDetailsViewTest(TestCase):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertRegex('asfa<td>o</td>s', r"<td>o</td>")
+
+        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll">')
+        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll">')
+
 
 
