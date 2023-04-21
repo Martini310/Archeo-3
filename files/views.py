@@ -70,11 +70,12 @@ def _search_vehicles(request):
     return vehicles, search or ""
 
 
-class AddVehicle(LoginRequiredMixin, CreateView):
+class AddVehicle(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """ A View to create a new instance of vehicle. """
     model = Vehicle
     fields = "__all__"
     success_url = reverse_lazy('files:list')
+    permission_required = 'files.add_vehicle'
 
 
 class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
@@ -94,7 +95,7 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         if formset.is_valid():
             # if form is not empty create new order with vehicles from form
             if any(len(row) > 0 for row in formset.cleaned_data):
-                user = User.objects.get(pk=1)
+                user = request.user
                 order = Order.objects.create(order_date=timezone.now(), orderer=user)
                 Vehicle.objects.bulk_create([Vehicle(tr=row['tr'], 
                                                      transfer_date=timezone.now(), 
@@ -108,6 +109,7 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
 
 
 @login_required
+@permission_required('files.view_order', raise_exception=True)
 def orders_to_do(request, status):
     """ A View with listed all orders divides into status categories. """
     orders = Order.objects.all()
@@ -117,14 +119,17 @@ def orders_to_do(request, status):
     return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
 
 
-class VehicleUpdateView(LoginRequiredMixin, UpdateView):
+class VehicleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ A View to update particular Vehicle - url:'update/<int:pk>/' """
     model = Vehicle
     fields = '__all__'
     success_url = reverse_lazy('files:list')
+    permission_required = 'files.change_vehicle'
+    permission_denied_message = 'Nie masz uprawnień do tej zawartości'
 
 
 @login_required
+@permission_required('files.change_vehicle')
 def order_details(request, pk):
     """ A View to update particular Order, Save or Reject Vehicles in Order - url:'order_details/<int:pk>/' """
     order = Order.objects.get(pk=pk)
@@ -138,7 +143,7 @@ def order_details(request, pk):
             for input_id in id_list:
                 Vehicle.objects.filter(pk=int(input_id)).update(status='e')
 
-        messages.success(request, ("Hurraa!!!"))
+        messages.success(request, ("Zmiany w zamówieniu zostały zapisane prawidłowo."))
         return redirect('files:list')
 
     else:
@@ -148,8 +153,9 @@ def order_details(request, pk):
 class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):
     """ A View to return a vehicle. """
     form_class = ReturnForm
+    # form_class.fields['transfering_to'].queryset = Vehicle.objects.filter(responsible_person!=request.user)
     template_name = 'files/return.html'
-    permission_required = 'files.can_return'
+    permission_required = 'files.return_vehicle'
 
     success_url = '/files/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
@@ -194,17 +200,17 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
     form_class = TransferForm
     success_url = reverse_lazy('files:user_list')
     success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
-    permission_required = 'files.change_vehicle'
+    permission_required = 'files.transfer_vehicle'
 
     def dispatch(self, request, *args, **kwargs):
         handler = super(TransferVehicleView, self).dispatch(request, *args, **kwargs)
         # Only allow editing if current user is owner
         if self.object.responsible_person != request.user:
-            return HttpResponseForbidden(u"Can't touch this.")
+            return HttpResponseForbidden("Can't touch this.")
         return handler
 
 
-class AcceptTransferVehicleView(ListView):
+class AcceptTransferVehicleView(LoginRequiredMixin, ListView):
     template_name = 'files/accept_vehicles.html'
     context_object_name = 'transfers'
 

@@ -33,5 +33,6 @@ class Vehicle(models.Model):
 
     class Meta:
         permissions = [
-            ("can_return", "Can return files"),
+            ("return_vehicle", "Can return vehicle"),
+            ("transfer_vehicle", "Can transfer vehicle"),
         ]
