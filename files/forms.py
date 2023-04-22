@@ -58,6 +58,12 @@ class TransferForm(forms.ModelForm):
     tr = forms.CharField(max_length=8, disabled=True)
     transfer_date = forms.DateField(disabled=True)
 
+    def __init__(self, *args, **kwargs):
+        # Exclude the current logged user from list of users
+        self.user = kwargs.pop('user')
+        super(TransferForm, self).__init__(*args, **kwargs)
+        self.fields['transfering_to'].queryset = models.User.objects.exclude(pk=self.user.pk)
+
     class Meta:
         model = models.Vehicle
         fields = ['tr', 'transfer_date', 'transfering_to', 'comments']

@@ -208,6 +208,12 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
         if self.object.responsible_person != request.user:
             return HttpResponseForbidden("Can't touch this.")
         return handler
+    
+    # Sending user object to the form, to verify which fields to display/remove
+    def get_form_kwargs(self):
+        kwargs = super(TransferVehicleView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
 
 class AcceptTransferVehicleView(LoginRequiredMixin, ListView):
