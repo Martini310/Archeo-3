@@ -1,7 +1,7 @@
 # pylint: disable=no-member
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from datetime import datetime, timedelta
 from django.utils import timezone
 from files.models import Order, Vehicle
@@ -99,6 +99,8 @@ class OrdersToDoViewTest(TestCase):
         self.assertRedirects(response, '/accounts/login/?next=' + self.url)
 
     def test_view_displays_orders_with_specified_status(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
+
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -113,6 +115,8 @@ class OrdersToDoViewTest(TestCase):
         self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
 
     def test_view_does_not_display_orders_with_different_status(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
+
         self.client.login(username='testuser', password='testpass')
         url = reverse('files:orders_to_do', args=['e'])
         response = self.client.get(url)
@@ -127,6 +131,7 @@ class OrdersToDoViewTest(TestCase):
         self.assertNotContains(response, f'Zamówienie nr {self.order_a.id}')
 
     def test_view_properly_count_files_with_different_status(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
         self.client.login(username='testuser', password='testpass')
         
         Vehicle.objects.filter(pk=3).update(order=self.order_a)
@@ -161,10 +166,11 @@ class OrderDetailsViewTest(TestCase):
         self.assertRedirects(response, '/accounts/login/?next=' + self.url)
 
     def test_view_display_all_files(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='change_vehicle'))
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
 
+        self.assertEqual(response.status_code, 200)
         self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll">')
         self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll">')
 
