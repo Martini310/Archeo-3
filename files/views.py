@@ -1,5 +1,4 @@
 # pylint: disable=no-member
-# import io
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView
@@ -8,14 +7,9 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-# from django.http import FileResponse
-# from django.utils.translation import gettext_lazy as _
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import ReturnForm, MyOrderFormSet, TransferForm
 from .models import Order, Vehicle, User
-# from reportlab.pdfgen import canvas
-# from reportlab.lib.units import inch
-# from reportlab.lib.pagesizes import letter
 
 # Create your views here.
 
@@ -153,7 +147,6 @@ def order_details(request, pk):
 class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):
     """ A View to return a vehicle. """
     form_class = ReturnForm
-    # form_class.fields['transfering_to'].queryset = Vehicle.objects.filter(responsible_person!=request.user)
     template_name = 'files/return.html'
     permission_required = 'files.return_vehicle'
 

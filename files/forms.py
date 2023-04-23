@@ -47,8 +47,6 @@ class MyOrderForm(forms.Form):
         if on_loan:
             raise ValidationError("Teczka jest już pobrana")
         return tr
-    # users = [(a, b) for a, b in enumerate(models.User.objects.all(), start=1)]
-    # orderer = forms.ChoiceField(label='Zamawiający', widget=forms.Select, choices=users)
 
 
 MyOrderFormSet = formset_factory(MyOrderForm, extra=10)

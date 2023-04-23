@@ -62,6 +62,68 @@ class MyOrderViewTest(TestCase):
         self.assertEqual(Order.objects.count(), 0)
         self.assertEqual(Vehicle.objects.count(), 0)
 
+    def test_my_order_view_post_15_vehicles(self):
+        # Create test data for the formset
+        vehicles = {f'form-{n}-tr': f'AA 12{n}' for n in range(15)}
+        formset_data = {
+            'form-TOTAL_FORMS': '15',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+        } | vehicles
+
+        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        self.assertEqual(response.status_code, 302) # Check if response is a redirect
+        self.assertEqual(response.url, reverse('files:list')) # Check if it redirects to the correct URL
+
+        # Check if a new order and vehicles have been created
+        self.assertEqual(Order.objects.count(), 1)
+        order = Order.objects.first()
+        self.assertEqual(order.orderer, self.user)
+        self.assertEqual(Vehicle.objects.count(), 15)
+
+        vehicle_1 = Vehicle.objects.get(tr='AA 120')
+        self.assertEqual(vehicle_1.order, order)
+        self.assertEqual(vehicle_1.comments, '')
+
+        vehicle_15 = Vehicle.objects.get(tr='AA 1214')
+        self.assertEqual(vehicle_15.order, order)
+        self.assertEqual(vehicle_15.comments, '')
+
+    def test_my_order_view_post_empty_fields_between_vehicles(self):
+        # Create test data for the formset
+        formset_data = {
+            'form-TOTAL_FORMS': '10',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-0-tr': 'AA 1234',
+            'form-0-comments': 'Test comment 1',
+            'form-1-tr': '',
+            'form-1-comments': '',
+            'form-2-tr': '',
+            'form-2-comments': '',
+            'form-3-tr': 'BB 1234',
+            'form-3-comments': 'Test comment',
+        }
+
+        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        self.assertEqual(response.status_code, 302) # Check if response is a redirect
+        self.assertEqual(response.url, reverse('files:list')) # Check if it redirects to the correct URL
+
+        # Check if a new order and vehicles have been created
+        self.assertEqual(Order.objects.count(), 1)
+        order = Order.objects.first()
+        self.assertEqual(order.orderer, self.user)
+        self.assertEqual(Vehicle.objects.count(), 2)
+
+        vehicle_1 = Vehicle.objects.get(tr='AA 1234')
+        self.assertEqual(vehicle_1.order, order)
+        self.assertEqual(vehicle_1.comments, 'Test comment 1')
+
+        vehicle_2 = Vehicle.objects.get(tr='BB 1234')
+        self.assertEqual(vehicle_2.order, order)
+        self.assertEqual(vehicle_2.comments, 'Test comment')
+        self.assertEqual(vehicle_2.pk, 2)
+
     def test_my_order_view_get(self):
         response = self.client.get(reverse('files:my_order'))
         self.assertEqual(response.status_code, 200) # Check if response is successful
@@ -97,6 +159,11 @@ class OrdersToDoViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/accounts/login/?next=' + self.url)
+
+    def test_view_require_permission(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
     def test_view_displays_orders_with_specified_status(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
@@ -165,6 +232,15 @@ class OrderDetailsViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/accounts/login/?next=' + self.url)
 
+    def test_view_require_permission(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=' + self.url)
+        response = self.client.get('/accounts/login/?next=' + self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'You dont have permission for this page')
+
     def test_view_display_all_files(self):
         self.user.user_permissions.add(Permission.objects.get(codename='change_vehicle'))
         self.client.login(username='testuser', password='testpass')
@@ -175,4 +251,27 @@ class OrderDetailsViewTest(TestCase):
         self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll">')
 
 
+class NotificationContextTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user2 = User.objects.create_user(username='testuser2', password='testpass')
 
+        self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+
+        self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='o', order=self.order)
+        self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
+
+        self.url = reverse('files:list')
+    
+    def test_user2_has_no_notifications(self):
+        self.client.login(username='testuser2', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context.get('notifications').get('data')), 0)
+        
+    def test_user2_has_notifications(self):
+        Vehicle.objects.all().update(transfering_to=self.user2)
+        self.client.login(username='testuser2', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context.get('notifications').get('data')), 2)
