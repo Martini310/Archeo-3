@@ -216,6 +216,7 @@ class OrdersToDoViewTest(TestCase):
         self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
         self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
 
+
 class OrderDetailsViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='testpass')
@@ -275,3 +276,80 @@ class NotificationContextTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context.get('notifications').get('data')), 2)
+
+
+class ReturnFormViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('files:return')
+
+        self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+
+        self.vehicle1 = Vehicle.objects.create(tr='AA 1234', responsible_person=self.user, status='o', order=self.order)
+        self.vehicle2 = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
+
+    def test_user_has_no_permissions(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_has_permissions(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='return_vehicle'))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'files/return.html')
+
+    def test_return_file(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='return_vehicle'))
+        self.time = timezone.now()
+
+        # Create test data for the formset
+        form_data = {
+            'tr': 'AA 1234',
+            'returner': self.user.pk,
+            'comments': 'Test comment 1',
+            'return_date': self.time,
+        }
+        self.client.post(reverse('files:return'), data=form_data)
+
+        self.assertEqual(Vehicle.objects.get(tr='AA 1234').status, 'r')
+        self.assertEqual(Vehicle.objects.get(tr='AA 1234').returner, self.user)
+        self.assertEqual(Vehicle.objects.get(tr='AA 1234').comments, 'Test comment 1')
+        self.assertEqual(Vehicle.objects.get(tr='AA 1234').return_date.today, self.time.today)
+
+
+class TransferVehicleViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user2 = User.objects.create_user(username='testuser2', password='testpass')
+
+        self.client.login(username='testuser', password='testpass')
+
+        self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+
+        self.vehicle1 = Vehicle.objects.create(tr='AA 1234', responsible_person=self.user, status='o', order=self.order)
+        self.vehicle2 = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
+        
+        self.url = reverse('files:transfer', args=[1])
+
+    def test_user_has_no_permissions(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    # def test_transfer_vehicle_to_user2(self):
+    #     self.user.user_permissions.add(Permission.objects.get(codename='transfer_vehicle'))
+
+    #     form_data = {
+    #         'transfering_to': self.user2,
+    #         'comments': 'succesful transfer :)',
+    #     }
+    #     print(Vehicle.objects.get(pk=1))
+    #     response = self.client.post(self.url, data=form_data)
+    #     self.assertEqual(response.status_code, 200)
+    #     # print(response.content.decode())
+    #     # self.assertEqual(response.url, reverse('files:user_list'))
+    #     print(Vehicle.objects.first().transfering_to)
+    #     self.assertEqual(Vehicle.objects.get(pk=1).transfering_to, self.user2)
+

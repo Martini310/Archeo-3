@@ -59,7 +59,7 @@ class TransferForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # Exclude the current logged user from list of users
         self.user = kwargs.pop('user')
-        super(TransferForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['transfering_to'].queryset = models.User.objects.exclude(pk=self.user.pk)
 
     class Meta:

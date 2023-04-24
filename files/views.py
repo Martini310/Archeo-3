@@ -153,6 +153,8 @@ class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
     success_url = '/files/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
 
+    time = timezone.now()
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         
@@ -166,7 +168,10 @@ class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
 
     def form_valid(self, form):
         Vehicle.objects.filter(
-            tr=form.cleaned_data['tr'], status='o').update(status='r')
+            tr=form.cleaned_data['tr'], status='o').update(status='r',
+                                                           returner=form.cleaned_data['returner'],
+                                                           comments=form.cleaned_data['comments'],
+                                                           return_date=self.time)
 
         # Store the value of 'returner' in the session
         self.request.session['returner'] = form.cleaned_data['returner'].pk
