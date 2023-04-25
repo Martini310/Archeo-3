@@ -319,37 +319,47 @@ class ReturnFormViewTest(TestCase):
         self.assertEqual(Vehicle.objects.get(tr='AA 1234').return_date.today, self.time.today)
 
 
-class TransferVehicleViewTest(TestCase):
+class TransferVehicleViewTestCase(TestCase):
     def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.user2 = User.objects.create_user(username='testuser2', password='testpass')
-
-        self.client.login(username='testuser', password='testpass')
-
+        self.user = User.objects.create_user(username='testuser', password='12345')
         self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+        self.vehicle = Vehicle.objects.create(tr='AB C123',
+                                              responsible_person=self.user,
+                                              order=self.order,
+                                              status='o',
+                                              transfer_date=timezone.now())
+        self.url = reverse('files:transfer', args=[self.vehicle.pk])
 
-        self.vehicle1 = Vehicle.objects.create(tr='AA 1234', responsible_person=self.user, status='o', order=self.order)
-        self.vehicle2 = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
-        
-        self.url = reverse('files:transfer', args=[1])
-
-    def test_user_has_no_permissions(self):
+    def test_user_permissions(self):
+        # Test that a non-owner user can't access the view
+        other_user = User.objects.create_user(username='otheruser', password='12345')
+        self.client.force_login(other_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
-    # def test_transfer_vehicle_to_user2(self):
-    #     self.user.user_permissions.add(Permission.objects.get(codename='transfer_vehicle'))
+    def test_view_form_fields(self):
+        # Test that logged user with permissions see fields
+        self.user.user_permissions.add(Permission.objects.get(codename='transfer_vehicle'))
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        form = response.context_data['form']
+        self.assertIn('transfering_to', form.fields)
+        self.assertIn('comments', form.fields)
 
-    #     form_data = {
-    #         'transfering_to': self.user2,
-    #         'comments': 'succesful transfer :)',
-    #     }
-    #     print(Vehicle.objects.get(pk=1))
-    #     response = self.client.post(self.url, data=form_data)
-    #     self.assertEqual(response.status_code, 200)
-    #     # print(response.content.decode())
-    #     # self.assertEqual(response.url, reverse('files:user_list'))
-    #     print(Vehicle.objects.first().transfering_to)
-    #     self.assertEqual(Vehicle.objects.get(pk=1).transfering_to, self.user2)
+    def test_transfer_vehicle(self):
+        # Test that transfer file to new_user is succesful
+        new_user = User.objects.create_user(username='newuser', password='12345')
+        self.user.user_permissions.add(Permission.objects.get(codename='transfer_vehicle'))
+        self.client.force_login(self.user)
+        data = {
+            'transfering_to': new_user.pk,
+            'comments': 'Test transfer',
+        }
 
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 302)
+        # print(response.context['form'].errors)
+        self.vehicle.refresh_from_db()
+        self.assertEqual(self.vehicle.transfering_to, new_user)
+        self.assertEqual(self.vehicle.comments, 'Test transfer')
