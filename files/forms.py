@@ -7,6 +7,11 @@ from . import models
 
 class ReturnForm(forms.ModelForm):
     """ Form for ReturnFormView to return vechicles. """
+    tr = forms.CharField(label='', 
+                         max_length=10, 
+                         widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 
+                                                       'class': 'form-control', 
+                                                       'oninput':"handleInput(event)"}))
     class Meta:
         model = models.Vehicle
         fields = ['tr', 'returner', 'comments']
@@ -65,3 +70,14 @@ class TransferForm(forms.ModelForm):
     class Meta:
         model = models.Vehicle
         fields = ['tr', 'transfer_date', 'transfering_to', 'comments']
+
+
+class AddVehicleForm(forms.ModelForm):
+    class Meta:
+        model = models.Vehicle
+        fields = '__all__'
+        widgets = {
+            'tr': forms.TextInput(attrs={
+                                        'placeholder': 'Numer rejestracyjny',
+                                        'oninput':"handleInput(event)",})
+        }

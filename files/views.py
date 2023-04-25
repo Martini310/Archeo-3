@@ -8,8 +8,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import ReturnForm, MyOrderFormSet, TransferForm
+from .forms import ReturnForm, MyOrderFormSet, TransferForm, AddVehicleForm
 from .models import Order, Vehicle, User
+from django import forms
 
 # Create your views here.
 
@@ -67,10 +68,11 @@ def _search_vehicles(request):
 class AddVehicle(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """ A View to create a new instance of vehicle. """
     model = Vehicle
-    fields = "__all__"
+    form_class = AddVehicleForm
+    # fields = "__all__"
     success_url = reverse_lazy('files:list')
     permission_required = 'files.add_vehicle'
-
+    
 
 class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """ View to create a new Order. """
