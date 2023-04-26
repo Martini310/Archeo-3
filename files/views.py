@@ -93,9 +93,8 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
             if any(len(row) > 0 for row in formset.cleaned_data):
                 user = request.user
                 order = Order.objects.create(order_date=timezone.now(), orderer=user)
-                Vehicle.objects.bulk_create([Vehicle(tr=row['tr'], 
-                                                     transfer_date=timezone.now(), 
-                                                     responsible_person=user, 
+                Vehicle.objects.bulk_create([Vehicle(tr=row['tr'],
+                                                     responsible_person=user,
                                                      order=order,
                                                      comments=row['comments']) 
                                                      for row in formset.cleaned_data if row.get('tr') is not None])
@@ -134,7 +133,7 @@ def order_details(request, pk):
         id_list = request.POST.getlist('boxes')
         if 'save' in request.POST:
             for input_id in id_list:
-                Vehicle.objects.filter(pk=int(input_id)).update(status='o')
+                Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
         elif 'reject' in request.POST:
             for input_id in id_list:
                 Vehicle.objects.filter(pk=int(input_id)).update(status='e')
