@@ -2,13 +2,13 @@
 
 
 {% block content %}
-    <h1>Create new Vehicle</h1>
-
+    <h1>Dodaj nową teczkę pojazdu</h1><br>
+<div class="container min-vw-50">
     <form action="" method="post">
         {% csrf_token %}
         {{form.as_p}}
         <input type="submit" value="Zapisz">
     </form>
-
+</div>
 {% endblock content %}
     

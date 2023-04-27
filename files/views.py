@@ -128,6 +128,7 @@ class VehicleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
 def order_details(request, pk):
     """ A View to update particular Order, Save or Reject Vehicles in Order - url:'order_details/<int:pk>/' """
     order = Order.objects.get(pk=pk)
+    statuses = dict(Vehicle.LOAN_STATUS)
     if request.method == "POST":
         # List of ids from vehicles with checked checkboxes
         id_list = request.POST.getlist('boxes')
@@ -142,7 +143,7 @@ def order_details(request, pk):
         return redirect('files:list')
 
     else:
-        return render(request, 'files/order_detail.html', context={'order': order})
+        return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
 
 
 class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):

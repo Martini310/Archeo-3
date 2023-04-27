@@ -73,11 +73,14 @@ class TransferForm(forms.ModelForm):
 
 
 class AddVehicleForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+            visible.field.widget.attrs['placeholder'] = visible.field.label
+        self.fields['tr'].widget.attrs['oninput'] = 'handleInput(event)'
+
     class Meta:
         model = models.Vehicle
         fields = '__all__'
-        widgets = {
-            'tr': forms.TextInput(attrs={
-                                        'placeholder': 'Numer rejestracyjny',
-                                        'oninput':"handleInput(event)",})
-        }

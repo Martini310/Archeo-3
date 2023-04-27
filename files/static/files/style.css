@@ -20,7 +20,15 @@
       width: 100%;
     }
   }
+  
+body {
+      background-color: rgb(214, 243, 255);
+}
 
 h2 {
     color: chartreuse;
+}
+
+#floatingInput {
+  margin-top: 3px;
 }

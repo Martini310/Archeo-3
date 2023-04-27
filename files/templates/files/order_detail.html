@@ -22,7 +22,7 @@
                 <tr>
                     <th scope="row">{{forloop.counter}}</th>
                     <td>{{vehicle.tr}}</td>
-                    <td>{{vehicle.status}}</td>
+                    <td>{{ statuses|get_item:vehicle.status }}</td>
                     <td>
                         
                         {% if vehicle.status == 'a' %}
