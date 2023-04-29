@@ -45,10 +45,9 @@ function addForm(e){
 
     formNum++
     newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
-    container.insertBefore(newForm, addButton)
+    container.insertBefore(newForm, Buttons)
 
     var lp = 'id_form-'+formNum+'-lp'
-    console.log(lp)
     document.getElementById(lp).innerHTML = formNum + 1
     
     totalForms.setAttribute('value', `${formNum+1}`)

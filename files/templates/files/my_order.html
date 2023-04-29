@@ -17,7 +17,7 @@
         </div>
         {{ form.errors.tr }}
     {% endfor %}
-    <div class='container'>
+    <div class='container' id="buttons">
         <button class="btn btn-secondary" id="add-form" type="button">Dodaj pole</button>
         <input class="btn btn-primary right-button" type="submit" value="Zamów" onclick="clicked(event)">
     </div>
@@ -28,6 +28,7 @@
     let birdForm = document.querySelectorAll("#tr-div")
     let container = document.querySelector("#form-container")
     let addButton = document.querySelector("#add-form")
+    let Buttons = document.querySelector("#buttons") 
     let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
 
     let formNum = birdForm.length-1

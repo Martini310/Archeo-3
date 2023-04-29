@@ -259,8 +259,8 @@ class NotificationContextTest(TestCase):
 
         self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
 
-        self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='o', order=self.order)
-        self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
+        self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='o', order=self.order, transfer_date=timezone.now())
+        self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order, transfer_date=timezone.now())
 
         self.url = reverse('files:list')
     
