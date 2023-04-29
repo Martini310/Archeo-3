@@ -20,10 +20,10 @@ class Vehicle(models.Model):
     transfering_to = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='transfering', blank=True, null=True, verbose_name='Przekazano do')
     comments = models.CharField('Uwagi', max_length=100, null=True, blank=True)
     LOAN_STATUS = (
-        ('a', 'Awaits'),
-        ('o', 'On Loan'),
-        ('r', 'Returned'),
-        ('e', 'rejected')
+        ('a', 'Oczekuje'), # a - Awaits
+        ('o', 'Wypożyczona'), # o - On loan
+        ('r', 'Zwrócona'), # r - Returned
+        ('e', 'Odrzucona') # e - Rejected/error
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
     order = models.ForeignKey(Order, related_name="vehicles", on_delete=models.SET_NULL, null=True, verbose_name='Zamówienie')
