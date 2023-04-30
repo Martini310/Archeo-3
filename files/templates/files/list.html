@@ -2,8 +2,9 @@
 {% load static %}
 {% block content %}
 
-    <h1>WSZYSTKIE TECZKI</h1>
-    
+    <div class="my-order-header">
+      <h2><strong>WSZYSTKIE TECZKI</strong></h2><br>
+    </div>
     <form 
         hx-get="{% url 'files:search' %}"
         hx-target="#search-results"

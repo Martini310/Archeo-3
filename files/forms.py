@@ -7,11 +7,19 @@ from . import models
 
 class ReturnForm(forms.ModelForm):
     """ Form for ReturnFormView to return vechicles. """
-    tr = forms.CharField(label='', 
-                         max_length=10, 
-                         widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 
-                                                       'class': 'form-control', 
-                                                       'oninput':"handleInput(event)"}))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+            visible.field.widget.attrs['placeholder'] = visible.field.label
+        self.fields['tr'].widget.attrs['oninput'] = 'handleInput(event)'
+
+
+    # tr = forms.CharField(label='', 
+    #                      max_length=10, 
+    #                      widget=forms.TextInput(attrs={'placeholder': 'Numer rejestracyjny', 
+    #                                                    'class': 'form-control', 
+    #                                                    'oninput':"handleInput(event)"}))
     class Meta:
         model = models.Vehicle
         fields = ['tr', 'returner', 'comments']

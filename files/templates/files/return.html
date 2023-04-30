@@ -2,11 +2,14 @@
 
 {% block content %}
 
-<h1>RETURN </h1>
-<form action="" method="POST">
+<div class="my-order-header">
+<h2><strong>ZWROT TECZKI</strong></h2>
+</div>
+
+<form class='my-order' action="" method="POST">
     {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="Submit">
+    <strong>{{form.as_p}}</strong>
+    <input class="btn btn-primary right-button" type="submit" value="Zatwierdź">
 </form>
 
 
