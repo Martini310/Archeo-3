@@ -16,32 +16,32 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Nr rejestracyjny</th>
+                <th scope="col">Uwagi</th>
                 <th scope="col">Status</th>
                 <th scope="col"><input class="form-check-input" type="checkbox" value="Select All" onclick="selectAll(this)" id="TestAll" /> check</th>
             </tr>
             </thead>
             <tbody>
                 {% for vehicle in order.vehicles.all %}
-                <tr>
+                  <tr>
                     <th scope="row">{{forloop.counter}}</th>
                     <td>{{vehicle.tr}}</td>
+                    <td>{{ vehicle.comments }}</td>
                     <td>{{ statuses|get_item:vehicle.status }}</td>
                     <td>
-                        
-                        {% if vehicle.status == 'a' %}
-    
-                        {% if event.approved %}
+                        {% if vehicle.status == 'a' %}   
+                          {% if event.approved %}
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll">
+                              <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll">
                             </div>
                             {% else %}
-                            <div class="form-check">
+                              <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll">
-                            </div>
-                        {% endif %}
+                              </div>
+                          {% endif %}
                         {% endif %}
                     </td>
-                </tr>
+                  </tr>
                 {% endfor %}
             </tbody>
         </table>

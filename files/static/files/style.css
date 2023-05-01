@@ -12,8 +12,10 @@
     .btn-danger, .btn-danger * {
         visibility: hidden;
     }
-    #form-checkkk, #form-checkkk * {
-        visibility: hidden;
+
+    th:nth-child(1n+4), td:nth-child(1n+4) {
+      display: none;
+      visibility: hidden;
     }
 
     /* adjust styles for printing */
