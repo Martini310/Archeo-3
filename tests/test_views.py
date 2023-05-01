@@ -173,8 +173,8 @@ class OrdersToDoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'files/orders_to_do.html')
         self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
-        self.assertContains(response, 'Do realizacji: 2')
-        self.assertContains(response, 'Liczba teczek ogółem: 2')
+        self.assertContains(response, '<td id="do-realizacji">2</td>')
+        self.assertContains(response, '<td id="ogółem">2</td>')
 
         self.assertContains(response, self.user.username)
         self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
@@ -190,8 +190,8 @@ class OrdersToDoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'files/orders_to_do.html')
         self.assertContains(response, f'Zamówienie nr {self.order_e.id}')
-        self.assertContains(response, 'Do realizacji: 0')
-        self.assertContains(response, 'Liczba teczek ogółem: 2')
+        self.assertContains(response, '<td id="do-realizacji">0</td>')
+        self.assertContains(response, '<td id="ogółem">2</td>')
         self.assertContains(response, self.user.username)
         self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
         self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
@@ -209,8 +209,8 @@ class OrdersToDoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
-        self.assertContains(response, 'Do realizacji: 2')
-        self.assertContains(response, 'Liczba teczek ogółem: 5')
+        self.assertContains(response, '<td id="do-realizacji">2</td>')
+        self.assertContains(response, '<td id="ogółem">5</td>')
 
         self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
         self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')

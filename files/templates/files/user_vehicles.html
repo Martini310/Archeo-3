@@ -20,7 +20,7 @@
     <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
         <a href="/files/user_list/" class="btn btn-primary">Wszystkie</a>
         {% for s, n in orders.1 %}
-            {% if request.path|stringformat:'s'|slice:'-2:-1' == s %}
+            {% if orders.3 == s %}
                 <a href="/files/user_list/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
             {% else %}
                 <a href="/files/user_list/{{s}}" class="btn btn-primary">{{n}}</a>

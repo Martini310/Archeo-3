@@ -3,18 +3,33 @@
 
 {% block content %}
 
-    {% for vehicle in transfers %}
+<div class="my-order-header">
+  <h2><strong>Teczki przekazane przez innych użytkowników</strong></h2><br>
+  <h4>Możesz je zaakceptować, wtedy będą przypięte do Twojego konta, lub odrzucić i wrócą do nadawcy.</h4>
+</div>
 
-    
-        <form action={% url 'files:accept' vehicle.id %} method=POST>
+<div class='container' style="padding: 100px">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for vehicle in transfers %}
+        <div class="col">
+            <form action={% url 'files:accept' vehicle.id %} method=POST>
             {% csrf_token %}
-            {{ vehicle }}<br>
-            <button class="btn btn-success" name='accept' type="submit">Przyjmij</button>
-            <button class="btn btn-danger" name='reject' type="submit">Odrzuć</button>
-        </form>
+              <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+                <div class="card-header">Od: {{ vehicle.responsible_person.username }}</div>
+                <div class="card-body">
+                <h5 class="card-title">{{ vehicle.tr }}</h5>
+                <p class="card-text">Zamówienie nr: {{ vehicle.order.id }}<br>Teczka pobrana: {{ vehicle.transfer_date }}</p>
+                <button class="btn btn-danger card-link" name='reject' type="submit">Odrzuć</button>
+                <button class="btn btn-success card-link" style="float: right" name='accept' type="submit">Przyjmij</button>
+              </div>
+            </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
-        
-    {% endfor %}
+
 
 {% endblock content %}
     

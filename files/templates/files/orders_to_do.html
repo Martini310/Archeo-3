@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="my-order-header">
-  <h2><strong>List zamówień do realizacji</strong></h1><br>
+  <h2><strong>List zamówień do realizacji</strong></h2><br>
 </div>
 
 <div class="btn-group"></div>
@@ -26,11 +26,11 @@
     </thead>
     {% for order in orders %}
     <tr>
-    <td>{{forloop.counter}}</td>
-    <td><a href="/files/order_details/{{order.0.id}}/">Zamówienie nr {{order.0.id}}</a></td>
-    <td>{{order.1}}</td>
-    <td>{{ order.0.vehicles.all.count }}</td>
-    <td>{{order.0.orderer}}</td>
+        <td>{{forloop.counter}}</td>
+        <td><a href="/files/order_details/{{order.0.id}}/">Zamówienie nr {{order.0.id}}</a></td>
+        <td id="do-realizacji">{{order.1}}</td>
+        <td id="ogółem">{{ order.0.vehicles.all.count }}</td>
+        <td>{{order.0.orderer}}</td>
     </tr>
     {% endfor %}
 </table>
