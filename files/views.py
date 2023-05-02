@@ -132,16 +132,19 @@ def order_details(request, pk):
     if request.method == "POST":
         # List of ids from vehicles with checked checkboxes
         id_list = request.POST.getlist('boxes')
-        if 'save' in request.POST:
-            for input_id in id_list:
-                Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
-        elif 'reject' in request.POST:
-            for input_id in id_list:
-                Vehicle.objects.filter(pk=int(input_id)).update(status='e')
+        if id_list:
+            if 'save' in request.POST:
+                for input_id in id_list:
+                    Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
+            elif 'reject' in request.POST:
+                for input_id in id_list:
+                    Vehicle.objects.filter(pk=int(input_id)).update(status='e')
 
-        messages.success(request, ("Zmiany w zamówieniu zostały zapisane prawidłowo."))
-        return redirect('files:list')
-
+            messages.success(request, ("Zmiany w zamówieniu zostały zapisane prawidłowo."))
+            return redirect('files:list')
+        else:
+            messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
+            return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
     else:
         return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
 

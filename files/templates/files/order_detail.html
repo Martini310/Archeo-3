@@ -8,6 +8,8 @@
     <h2>Data: <strong>{{ order.order_date }}</strong></h2>
     <h2>Zamawiający: <strong>{{ order.orderer }}</strong></h2>
     
+    <button class="btn btn-primary right-button" style="margin-right: 50px;" onclick="window.print()">Drukuj</button>
+    <br>
     <form action="" method="post">
         {% csrf_token %}
 
@@ -47,13 +49,12 @@
         </table>
     
         <br/>
-        <button class="btn btn-success" name='save' type="submit">Save</button>
-        <button class="btn btn-danger" name='reject' type="submit">Reject</button>
+        <div class="d-flex justify-content-evenly">
+            <button class="btn btn-danger" name='reject' type="submit">Odrzuć</button>
+            <button class="btn btn-success" name='save' type="submit">Wydaj</button>
+        </div>
     </form>
 </div>
-
-<button class="btn btn-primary" onclick="window.print()">Drukuj</button>
-
 
 <script>
     function selectAll(checkBox) {
@@ -65,6 +66,3 @@
 </script>
 
 {% endblock content %}
-
-
-

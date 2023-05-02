@@ -7,12 +7,14 @@
       visibility: visible;
     }
     .btn-success, .btn-success * {
-        visibility: hidden;
+      visibility: hidden;
     }
     .btn-danger, .btn-danger * {
-        visibility: hidden;
+      visibility: hidden;
     }
-
+    .btn-primary, .btn-primary * {
+      visibility: hidden;
+    }
     th:nth-child(1n+4), td:nth-child(1n+4) {
       display: none;
       visibility: hidden;
