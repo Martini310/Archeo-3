@@ -363,3 +363,41 @@ class TransferVehicleViewTestCase(TestCase):
         self.vehicle.refresh_from_db()
         self.assertEqual(self.vehicle.transfering_to, new_user)
         self.assertEqual(self.vehicle.comments, 'Test transfer')
+
+
+class ListUserVehiclesViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
+
+        self.user2 = User.objects.create_user(username='usertest', password='testpass')
+        self.order_2 = Order.objects.create(order_date=timezone.now(), orderer=self.user2)
+
+        self.vehicle1 = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='a', order=self.order)
+        self.vehicle2 = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='r', order=self.order)
+        self.vehicle3 = Vehicle.objects.create(tr='ABC C123', responsible_person=self.user, status='o', order=self.order)
+        self.vehicle4 = Vehicle.objects.create(tr='XYC Z789', responsible_person=self.user, status='e', order=self.order)
+
+        self.vehicle5 = Vehicle.objects.create(tr='AB A123', responsible_person=self.user2, status='a', order=self.order_2)
+        self.vehicle6 = Vehicle.objects.create(tr='XY A789', responsible_person=self.user2, status='r', order=self.order_2)
+        self.vehicle7 = Vehicle.objects.create(tr='AB D123', responsible_person=self.user2, status='o', order=self.order_2)
+        self.vehicle8 = Vehicle.objects.create(tr='XY D789', responsible_person=self.user2, status='e', order=self.order_2)
+
+        self.url = reverse('files:user_list')
+
+    def test_user_has_only_self_files(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'files/user_vehicles.html')
+
+        self.assertContains(response, 'AB C123')
+        self.assertContains(response, 'XY Z789')
+        self.assertContains(response, 'ABC C123')
+        self.assertContains(response, 'XYC Z789')
+        self.assertNotContains(response, f'AB A123')
+        self.assertNotContains(response, f'XY A789')
+        self.assertNotContains(response, f'AB D123')
+        self.assertNotContains(response, f'XY D789')
+
