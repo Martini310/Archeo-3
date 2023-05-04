@@ -25,15 +25,16 @@
         <th>Zamawiający</th>
     </thead>
     {% for order in orders %}
-    <tr>
+    
+    <tr onclick="window.location='http:/files/order_details/{{order.0.id}}/'">
         <td>{{forloop.counter}}</td>
-        <td><a href="/files/order_details/{{order.0.id}}/">Zamówienie nr {{order.0.id}}</a></td>
+        <td>Zamówienie nr {{order.0.id}}</td>
         <td id="do-realizacji">{{order.1}}</td>
         <td id="ogółem">{{ order.0.vehicles.all.count }}</td>
         <td>{{order.0.orderer}}</td>
     </tr>
     {% endfor %}
 </table>
-    
+
 {% endblock content %}
     

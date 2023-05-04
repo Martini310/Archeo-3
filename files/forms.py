@@ -66,7 +66,7 @@ MyOrderFormSet = formset_factory(MyOrderForm, extra=10)
 
 
 class TransferForm(forms.ModelForm):
-    tr = forms.CharField(max_length=8, disabled=True)
+    tr = forms.CharField(max_length=9, disabled=True)
     transfer_date = forms.DateField(disabled=True)
 
     def __init__(self, *args, **kwargs):
@@ -81,7 +81,7 @@ class TransferForm(forms.ModelForm):
 
 
 class AddVehicleForm(forms.ModelForm):
-
+    """Initiate the form with assigned class, placeholder, and function to uppercase letters in TR field"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for visible in self.visible_fields():

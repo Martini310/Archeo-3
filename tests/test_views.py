@@ -2,7 +2,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User, Permission
-from datetime import datetime, timedelta
 from django.utils import timezone
 from files.models import Order, Vehicle
 from files.forms import MyOrderFormSet
@@ -248,8 +247,8 @@ class OrderDetailsViewTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll">')
-        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll">')
+        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll1">')
+        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll2">')
 
 
 class NotificationContextTest(TestCase):
@@ -268,14 +267,14 @@ class NotificationContextTest(TestCase):
         self.client.login(username='testuser2', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context.get('notifications').get('data')), 0)
+        self.assertEqual(len(response.context.get('notifications').get('transfers')), 0)
         
     def test_user2_has_notifications(self):
         Vehicle.objects.all().update(transfering_to=self.user2)
         self.client.login(username='testuser2', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context.get('notifications').get('data')), 2)
+        self.assertEqual(len(response.context.get('notifications').get('transfers')), 2)
 
 
 class ReturnFormViewTest(TestCase):
@@ -385,7 +384,12 @@ class ListUserVehiclesViewTest(TestCase):
 
         self.url = reverse('files:user_list')
 
-    def test_user_has_only_self_files(self):
+    def test_login_required(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=/files/user_list/')
+
+    def test_user_has_only_self_vehicles(self):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
 
@@ -396,8 +400,74 @@ class ListUserVehiclesViewTest(TestCase):
         self.assertContains(response, 'XY Z789')
         self.assertContains(response, 'ABC C123')
         self.assertContains(response, 'XYC Z789')
-        self.assertNotContains(response, f'AB A123')
-        self.assertNotContains(response, f'XY A789')
-        self.assertNotContains(response, f'AB D123')
-        self.assertNotContains(response, f'XY D789')
 
+        self.assertNotContains(response, 'AB A123')
+        self.assertNotContains(response, 'XY A789')
+        self.assertNotContains(response, 'AB D123')
+        self.assertNotContains(response, 'XY D789')
+
+    def test_display_only_awaits_vehicles(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('files:user_list', args=['a'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'AB C123')
+
+        self.assertNotContains(response, 'XY Z789')
+        self.assertNotContains(response, 'ABC C123')
+        self.assertNotContains(response, 'XYC Z789')
+
+    def test_display_only_returned_vehicles(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('files:user_list', args=['r'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'XY Z789')
+
+        self.assertNotContains(response, 'AB C123')
+        self.assertNotContains(response, 'ABC C123')
+        self.assertNotContains(response, 'XYC Z789')
+
+    def test_display_only_onloan_vehicles(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('files:user_list', args=['o'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'ABC C123')
+
+        self.assertNotContains(response, 'AB C123')
+        self.assertNotContains(response, 'XY Z789')
+        self.assertNotContains(response, 'XYC Z789')
+
+    def test_display_only_rejected_vehicles(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('files:user_list', args=['e'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'XYC Z789')
+
+        self.assertNotContains(response, 'AB C123')
+        self.assertNotContains(response, 'XY Z789')
+        self.assertNotContains(response, 'ABC C123')
+
+    def test_display_vehicles_transfered_to_user2_in_user(self):
+        # Test if vehicle transfered but not accepted is still in responsible user account
+        Vehicle.objects.filter(id=3).update(transfering_to=self.user2)
+
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ABC C123')
+
+    def test_not_display_vehicles_transfered_to_user2(self):
+        # Test if vehicle transfered but not accepted is not in 'transfering_to' user account
+        self.client.login(username='usertest', password='testpass')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'ABC C123')

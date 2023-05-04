@@ -18,23 +18,18 @@ def notification_context(request):
     """Context dictionary for all templates in app"""
     # look up the notifications for the current user
     transfers = Vehicle.objects.filter(transfering_to=request.user.id)
+    orders = len([order for order in Order.objects.all() if any(
+        [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == 'a'])]) or 0
     # The return value must be a dict, and any values in that dict
-    # are added to the template context for all templates.        
+    # are added to the template context for all templates.
     # You might want to use more unique names here, to avoid having these
     # variables clash with variables added by a view.  For example, `count` could easily
     # be used elsewhere.
-    return {'notifications': {'data': transfers,}}
+    return {'notifications': {'transfers': transfers, 'count_orders_to_do': orders}}
 
 
 class HomeView(TemplateView):
     template_name = "home.html"
-    
-
-class ListAllVechicles(ListView):
-    """ A View with listed all vehicles in DB. """
-    model = Vehicle
-    template_name = 'files/list.html'
-    context_object_name = 'vehicle_list'
     
 
 def list_view(request):
@@ -69,7 +64,7 @@ class AddVehicle(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """ A View to create a new instance of vehicle. """
     model = Vehicle
     form_class = AddVehicleForm
-    # fields = "__all__"
+
     success_url = reverse_lazy('files:list')
     permission_required = 'files.add_vehicle'
     

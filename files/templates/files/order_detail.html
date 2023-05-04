@@ -25,7 +25,7 @@
             </thead>
             <tbody>
                 {% for vehicle in order.vehicles.all %}
-                  <tr>
+                  <tr onclick="checkCheckbox('TestAll{{forloop.counter}}');">
                     <th scope="row">{{forloop.counter}}</th>
                     <td>{{vehicle.tr}}</td>
                     <td>{{ vehicle.comments }}</td>
@@ -34,11 +34,11 @@
                         {% if vehicle.status == 'a' %}   
                           {% if event.approved %}
                             <div class="form-check">
-                              <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll">
+                              <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll{{forloop.counter}}">
                             </div>
                             {% else %}
                               <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll">
+                                <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll{{forloop.counter}}">
                               </div>
                           {% endif %}
                         {% endif %}
@@ -63,6 +63,19 @@
             get[i].checked = checkBox.checked;
         }
     }
+</script>
+
+<script>
+  function checkCheckbox(checkboxId)
+  {
+    var chk = document.getElementById(checkboxId);
+    if (chk.checked == true) {
+      chk.checked = false;
+    }
+    else {
+      chk.checked = true;
+    }
+  }
 </script>
 
 {% endblock content %}

@@ -13,7 +13,7 @@ class Order(models.Model):
 
 
 class Vehicle(models.Model):
-    tr = models.CharField('TR', max_length=8)
+    tr = models.CharField('TR', max_length=9)
     transfer_date = models.DateTimeField('Data pobrania', blank=True, null=True)
     return_date = models.DateTimeField('Data zwrotu', blank=True, null=True)
     responsible_person = models.ForeignKey(User, related_name="vehicles", on_delete=models.RESTRICT, verbose_name='Pobierający')
