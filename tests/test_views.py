@@ -155,18 +155,20 @@ class OrdersToDoViewTest(TestCase):
         self.url = reverse('files:orders_to_do', args=['a'])
 
     def test_view_requires_login(self):
+        # Check if not logged user is redirected to login page
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/accounts/login/?next=' + self.url)
 
     def test_view_require_permission(self):
+        # Check if logged user has a permission to see Orders_to_do page
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
     def test_view_displays_orders_with_specified_status(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
-
+        # Check if view displays only orders with vehicles with status 'a'(awaits)
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -182,7 +184,7 @@ class OrdersToDoViewTest(TestCase):
 
     def test_view_does_not_display_orders_with_different_status(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
-
+        # Check if view properly displays filtered orders (vehicles with status 'e')
         self.client.login(username='testuser', password='testpass')
         url = reverse('files:orders_to_do', args=['e'])
         response = self.client.get(url)
@@ -199,7 +201,7 @@ class OrdersToDoViewTest(TestCase):
     def test_view_properly_count_files_with_different_status(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
         self.client.login(username='testuser', password='testpass')
-        
+
         Vehicle.objects.filter(pk=3).update(order=self.order_a)
         Vehicle.objects.filter(pk=5).update(order=self.order_a)
         Vehicle.objects.filter(pk=7).update(order=self.order_a)

@@ -10,7 +10,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import ReturnForm, MyOrderFormSet, TransferForm, AddVehicleForm
 from .models import Order, Vehicle, User
-from django import forms
 
 # Create your views here.
 
@@ -156,8 +155,7 @@ class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
     time = timezone.now()
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        
+        kwargs = super().get_form_kwargs() 
         # Retrieve the value of 'returner' from the session
         returner_pk = self.request.session.get('returner')
         if returner_pk:
@@ -172,7 +170,6 @@ class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
                                                            returner=form.cleaned_data['returner'],
                                                            comments=form.cleaned_data['comments'],
                                                            return_date=self.time)
-
         # Store the value of 'returner' in the session
         self.request.session['returner'] = form.cleaned_data['returner'].pk
 
@@ -232,5 +229,4 @@ def update_transfer_status_view(request, pk):
             Vehicle.objects.filter(id=pk).update(transfering_to=None)
 
         return redirect(reverse_lazy('files:user_list'))
-    
     
