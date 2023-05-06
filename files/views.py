@@ -97,15 +97,18 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         return self.render_to_response({'my_order_formset': formset})
 
 
-@login_required
-@permission_required('files.view_order', raise_exception=True)
-def orders_to_do(request, status):
+class OrdersToDoView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     """ A View with listed all orders divides into status categories. """
-    orders = Order.objects.all()
-    orders = [(order, order.vehicles.filter(status='a').count) for order in orders if any(
-        [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == status])]
-    abr = Vehicle.LOAN_STATUS
-    return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
+    model = Order
+    template_name = 'orders_to_do.html'
+    permission_required = 'files.view_order'
+
+    def get(self, request, status):
+        orders = Order.objects.all()
+        orders = [(order, order.vehicles.filter(status='a').count) for order in orders if any(
+                [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == status])]
+        abr = Vehicle.LOAN_STATUS
+        return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
 
 
 class VehicleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
