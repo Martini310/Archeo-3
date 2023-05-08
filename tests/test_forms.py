@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from files.forms import MyOrderForm, TransferForm
 from files.models import Vehicle, User
+from django.utils import timezone
 # Create your tests here.
 
 class MyOrderFormTest(TestCase):
@@ -33,16 +34,34 @@ class MyOrderFormTest(TestCase):
         form = MyOrderForm(data={'tr': tr})
         self.assertFalse(form.is_valid())
         
+
 class TransferFormTest(TestCase):
+    
+    def setUp(self):
+        self.now = timezone.now()
+        self.user1 = User.objects.create_user(username='user1', password='password')
+        self.user2 = User.objects.create_user(username='user2', password='password')
+        self.vehicle = Vehicle.objects.create(tr='123456789', transfer_date=self.now, responsible_person=self.user1)
 
-    def test_transfer_to_another_user(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.user2 = User.objects.create_user(username='testuser2', password='testpass')
-
-        self.client.login(username='testuser', password='testpass')
-        # user = User.objects.create(username='test')
-        # user2 = User.objects.create(username='test2')
-        Vehicle.objects.create(tr='AA 12345', responsible_person=self.user, status='o')
-        form = TransferForm(data={'transfering_to': self.user2})
+    def test_valid_form(self):
+        form_data = {
+            'tr': '123456789',
+            'transfer_date': self.now,
+            'transfering_to': self.user2.pk,
+            'comments': 'Some comments'
+        }
+        form = TransferForm(data=form_data, user=self.user1, instance=self.vehicle)
+        # print(form.errors)
         self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        form_data = {
+            'tr': '123456789',
+            'transfer_date': self.now,
+            'transfering_to': self.user1.pk,  # Should exclude current user
+            'comments': 'Some comments'
+        }
+        form = TransferForm(data=form_data, user=self.user1, instance=self.vehicle)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertEqual(form.errors['transfering_to'], ['Select a valid choice. That choice is not one of the available choices.'])
