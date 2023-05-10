@@ -5,7 +5,7 @@ from django.template.defaulttags import register
 
 # Create your models here.
 class Order(models.Model):
-    order_date = models.DateTimeField('Data zamówienia')
+    order_date = models.DateTimeField('Data zamówienia', auto_now_add=True)
     orderer = models.ForeignKey(User, related_name="orders", on_delete=models.RESTRICT, verbose_name='Zamawiający')
 
     def __str__(self) -> str:

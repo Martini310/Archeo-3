@@ -1,7 +1,7 @@
 # pylint: disable=no-member
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView
+from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView, View
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib import messages
@@ -86,7 +86,9 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
             # if form is not empty create new order with vehicles from form
             if any(len(row) > 0 for row in formset.cleaned_data):
                 user = request.user
-                order = Order.objects.create(order_date=timezone.now(), orderer=user)
+                # order = Order.objects.create(order_date=timezone.now(), orderer=user)
+                order = Order.objects.create(orderer=user)
+
                 Vehicle.objects.bulk_create([Vehicle(tr=row['tr'],
                                                      responsible_person=user,
                                                      order=order,
@@ -120,14 +122,53 @@ class VehicleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
     permission_denied_message = 'Nie masz uprawnień do tej zawartości'
 
 
-@login_required
-@permission_required('files.change_vehicle')
-def order_details(request, pk):
-    """ A View to update particular Order, Save or Reject Vehicles in Order - url:'order_details/<int:pk>/' """
-    order = Order.objects.get(pk=pk)
-    statuses = dict(Vehicle.LOAN_STATUS)
-    if request.method == "POST":
+# @login_required
+# @permission_required('files.change_vehicle')
+# def order_details(request, pk):
+#     """ A View to update particular Order, Save or Reject Vehicles in Order - url:'order_details/<int:pk>/' """
+#     order = Order.objects.get(pk=pk)
+#     statuses = dict(Vehicle.LOAN_STATUS)
+#     if request.method == "POST":
+#         # List of ids from vehicles with checked checkboxes
+#         id_list = request.POST.getlist('boxes')
+#         if id_list:
+#             if 'save' in request.POST:
+#                 for input_id in id_list:
+#                     Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
+#             elif 'reject' in request.POST:
+#                 for input_id in id_list:
+#                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
+
+#             messages.success(request, ("Zmiany w zamówieniu zostały zapisane prawidłowo."))
+#             return redirect('files:list')
+#         else:
+#             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
+#             return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
+#     else:
+#         return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
+
+
+class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, View):
+    """
+    A view to update a particular Order, save or reject Vehicles in the Order.
+    URL: 'order_details/<int:pk>/'
+    """
+    model = Vehicle
+    template_name = 'files/order_detail.html'
+
+    permission_required = 'files.change_vehicle'
+    success_message = "Zmiany w zamówieniu zostały zapisane prawidłowo."
+    permission_denied_message = "Nie masz dostępu do tej zawartości."
+    
+    def get(self, request, pk):
+        order = Order.objects.get(pk=pk)
+        statuses = dict(Vehicle.LOAN_STATUS)
+        return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
+    
+    def post(self, request, pk):
         # List of ids from vehicles with checked checkboxes
+        order = Order.objects.get(pk=pk)
+        statuses = dict(Vehicle.LOAN_STATUS)
         id_list = request.POST.getlist('boxes')
         if id_list:
             if 'save' in request.POST:
@@ -137,13 +178,10 @@ def order_details(request, pk):
                 for input_id in id_list:
                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
 
-            messages.success(request, ("Zmiany w zamówieniu zostały zapisane prawidłowo."))
             return redirect('files:list')
         else:
             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
             return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
-    else:
-        return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
 
 
 class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):

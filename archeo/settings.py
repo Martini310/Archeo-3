@@ -122,11 +122,11 @@ TIME_ZONE = 'Europe/Warsaw'
 
 DATETIME_FORMAT = 'd-m-Y H:i:s'
 
-USE_L10N = False
+USE_L10N = True
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -143,4 +143,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_TRUSTED_ORIGINS = ["https://archeo-3.martini310.repl.co"]
 
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/" 
+LOGOUT_REDIRECT_URL = "/"
