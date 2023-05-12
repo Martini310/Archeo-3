@@ -1,10 +1,3 @@
-{% comment %} <div id="search-results">
-<ul>
-    {% for car in vehicle_list %}
-        <li>{{car}} <a href="/files/update/{{car.id}}/">edytuj</a></li>
-    {% endfor %}
-</ul>
-</div> {% endcomment %}
 <div id="search-results" class='container'>
     <i>Znalezionych teczek: <b>{{ vehicle_list.count }}</b></i>
     <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
