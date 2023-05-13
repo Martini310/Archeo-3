@@ -34,13 +34,13 @@ def list_view(request):
     vehicles, search = _search_vehicles(request)
     users = User.objects.all()
     context = {'vehicle_list': vehicles, 'search': search or "", 'users': users}
-    return render(request, "files/list.html", context)
+    return render(request, "pojazd/list.html", context)
 
 
 def search_view(request):
     vehicles, search = _search_vehicles(request)
     context = {'vehicle_list': vehicles, 'search': search or ""}
-    return render(request, "files/search_results.html", context)
+    return render(request, "pojazd/search_results.html", context)
 
 
 def _search_vehicles(request):
@@ -63,13 +63,13 @@ class AddVehicle(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Vehicle
     form_class = AddVehicleForm
 
-    success_url = reverse_lazy('files:list')
-    permission_required = 'files.add_vehicle'
+    success_url = reverse_lazy('pojazd:list')
+    permission_required = 'pojazd.add_vehicle'
     
 
 class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """ View to create a new Order. """
-    template_name = 'files/my_order.html'
+    template_name = 'pojazd/my_order.html'
     success_message = "sukces"
 
     def get(self, *args, **kwargs):
@@ -94,7 +94,7 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
                                                      comments=row['comments']) 
                                                      for row in formset.cleaned_data if row.get('tr') is not None])
                 messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
-                return redirect(reverse_lazy("files:list"))
+                return redirect(reverse_lazy("pojazd:list"))
         return self.render_to_response({'my_order_formset': formset})
 
 
@@ -102,49 +102,23 @@ class OrdersToDoView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     """ A View with listed all orders divides into status categories. """
     model = Order
     template_name = 'orders_to_do.html'
-    permission_required = 'files.view_order'
+    permission_required = 'pojazd.view_order'
 
     def get(self, request, status):
         orders = Order.objects.all()
         orders = [(order, order.vehicles.filter(status='a').count) for order in orders if any(
                 [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == status])]
         abr = Vehicle.LOAN_STATUS
-        return render(request, 'files/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
+        return render(request, 'pojazd/orders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
 
 
 class VehicleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ A View to update particular Vehicle - url:'update/<int:pk>/' """
     model = Vehicle
     fields = '__all__'
-    success_url = reverse_lazy('files:list')
-    permission_required = 'files.change_vehicle'
+    success_url = reverse_lazy('pojazd:list')
+    permission_required = 'pojazd.change_vehicle'
     permission_denied_message = 'Nie masz uprawnień do tej zawartości'
-
-
-# @login_required
-# @permission_required('files.change_vehicle')
-# def order_details(request, pk):
-#     """ A View to update particular Order, Save or Reject Vehicles in Order - url:'order_details/<int:pk>/' """
-#     order = Order.objects.get(pk=pk)
-#     statuses = dict(Vehicle.LOAN_STATUS)
-#     if request.method == "POST":
-#         # List of ids from vehicles with checked checkboxes
-#         id_list = request.POST.getlist('boxes')
-#         if id_list:
-#             if 'save' in request.POST:
-#                 for input_id in id_list:
-#                     Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
-#             elif 'reject' in request.POST:
-#                 for input_id in id_list:
-#                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
-
-#             messages.success(request, ("Zmiany w zamówieniu zostały zapisane prawidłowo."))
-#             return redirect('files:list')
-#         else:
-#             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
-#             return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
-#     else:
-#         return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
 
 
 class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, View):
@@ -153,16 +127,16 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
     URL: 'order_details/<int:pk>/'
     """
     model = Vehicle
-    template_name = 'files/order_detail.html'
+    template_name = 'pojazd/order_detail.html'
 
-    permission_required = 'files.change_vehicle'
+    permission_required = 'pojazd.change_vehicle'
     success_message = "Zmiany w zamówieniu zostały zapisane prawidłowo."
     permission_denied_message = "Nie masz dostępu do tej zawartości."
     
     def get(self, request, pk):
         order = Order.objects.get(pk=pk)
         statuses = dict(Vehicle.LOAN_STATUS)
-        return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
+        return render(request, 'pojazd/order_detail.html', context={'order': order, 'statuses': statuses})
     
     def post(self, request, pk):
         # List of ids from vehicles with checked checkboxes
@@ -177,19 +151,19 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
                 for input_id in id_list:
                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
 
-            return redirect('files:list')
+            return redirect('pojazd:list')
         else:
             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
-            return render(request, 'files/order_detail.html', context={'order': order, 'statuses': statuses})
+            return render(request, 'pojazd/order_detail.html', context={'order': order, 'statuses': statuses})
 
 
 class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):
     """ A View to return a vehicle. """
     form_class = ReturnForm
-    template_name = 'files/return.html'
-    permission_required = 'files.return_vehicle'
+    template_name = 'pojazd/return.html'
+    permission_required = 'pojazd.return_vehicle'
 
-    success_url = '/files/return/'
+    success_url = '/pojazd/return/'
     success_message = "Teczka o numerze %(tr)s została zwrócona prawidłowo"
 
     time = timezone.now()
@@ -220,22 +194,22 @@ class ListUserVehiclesView(LoginRequiredMixin, ListView):
     """ List all vehicles that currently logged user is responsible for. """
     model = Vehicle
     context_object_name = 'orders' # 'user_vehicles'
-    template_name = 'files/user_vehicles.html'
+    template_name = 'pojazd/user_vehicles.html'
 
     def get(self, request, status='aore'):
         orders = [order for order in Order.objects.all() if any(vehicle.responsible_person.username == request.user.get_username() and vehicle.status in status for vehicle in order.vehicles.all())]
         transfers = Vehicle.objects.filter(transfering_to=self.request.user)
         context = {'orders': (orders, Vehicle.LOAN_STATUS, status, transfers)}
-        return render(request, 'files/user_vehicles.html', context)
+        return render(request, 'pojazd/user_vehicles.html', context)
 
 
 class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     """ Update View to change the person responsible for vehicle file."""
     model = Vehicle
     form_class = TransferForm
-    success_url = reverse_lazy('files:user_list')
+    success_url = reverse_lazy('pojazd:user_list')
     success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
-    permission_required = 'files.transfer_vehicle'
+    permission_required = 'pojazd.transfer_vehicle'
 
     def dispatch(self, request, *args, **kwargs):
         handler = super(TransferVehicleView, self).dispatch(request, *args, **kwargs)
@@ -252,7 +226,7 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
 
 
 class AcceptTransferVehicleView(LoginRequiredMixin, ListView):
-    template_name = 'files/accept_vehicles.html'
+    template_name = 'pojazd/accept_vehicles.html'
     context_object_name = 'transfers'
 
     def get_queryset(self):
@@ -268,5 +242,5 @@ def update_transfer_status_view(request, pk):
         elif 'reject' in request.POST:
             Vehicle.objects.filter(id=pk).update(transfering_to=None)
 
-        return redirect(reverse_lazy('files:user_list'))
+        return redirect(reverse_lazy('pojazd:user_list'))
     

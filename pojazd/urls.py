@@ -1,14 +1,13 @@
 from django.urls import path
 from . import views
 
-app_name = 'files'
+app_name = 'pojazd'
 
 urlpatterns = [
     # path('list/', views.ListAllVechicles.as_view(), name='list'),
     path('list/', views.list_view, name='list'),
     path('add/', views.AddVehicle.as_view(), name='add'),
     path('my_order/', views.MyOrderView.as_view(), name='my_order'),
-    # path('order_details/<int:pk>/', views.order_details, name='order_details'),
     path('order_details/<int:pk>/', views.OrderDetails.as_view(), name='order_details'),
     path('update/<int:pk>/', views.VehicleUpdateView.as_view(), name='update_vehicle'),
     path('orders_to_do/<str:status>/', views.OrdersToDoView.as_view(), name='orders_to_do'),

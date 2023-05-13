@@ -7,7 +7,7 @@
     <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
     {% if orders.3 %}
     Inni użytkownicy przekazują Ci teczki: 
-    <a href={% url 'files:accept_vehicles' %}><button type="button" class="btn btn-primary position-relative" >
+    <a href={% url 'pojazd:accept_vehicles' %}><button type="button" class="btn btn-primary position-relative" >
         Odbierz
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           {{ orders.3.count }}
@@ -18,12 +18,12 @@
     </div>
 
     <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
-        <a href="/files/user_list/" class="btn btn-primary">Wszystkie</a>
+        <a href="/pojazd/user_list/" class="btn btn-primary">Wszystkie</a>
         {% for s, n in orders.1 %}
             {% if orders.3 == s %}
-                <a href="/files/user_list/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
+                <a href="/pojazd/user_list/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
             {% else %}
-                <a href="/files/user_list/{{s}}" class="btn btn-primary">{{n}}</a>
+                <a href="/pojazd/user_list/{{s}}" class="btn btn-primary">{{n}}</a>
             {% endif %}
         {% endfor %}
     </div>
@@ -55,7 +55,7 @@
                 <td>{{ vehicle.transfer_date }}</td>
                 <td>{{ vehicle.status|upper }}</td>
                 <td>{% if vehicle.status == 'o' %}
-                    <a class='btn btn-primary'href="/files/transfer/{{vehicle.id}}/">Przekaż</a>
+                    <a class='btn btn-primary'href="/pojazd/transfer/{{vehicle.id}}/">Przekaż</a>
                     {% else %}---
                     {% endif %}
                 </td>

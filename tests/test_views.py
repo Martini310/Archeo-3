@@ -3,8 +3,8 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User, Permission
 from django.utils import timezone
-from files.models import Order, Vehicle
-from files.forms import MyOrderFormSet
+from pojazd.models import Order, Vehicle
+from pojazd.forms import MyOrderFormSet
 
 
 class MyOrderViewTest(TestCase):
@@ -28,9 +28,9 @@ class MyOrderViewTest(TestCase):
             'form-2-comments': '',
         }
 
-        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        response = self.client.post(reverse('pojazd:my_order'), data=formset_data)
         self.assertEqual(response.status_code, 302) # Check if response is a redirect
-        self.assertEqual(response.url, reverse('files:list')) # Check if it redirects to the correct URL
+        self.assertEqual(response.url, reverse('pojazd:list')) # Check if it redirects to the correct URL
 
         # Check if a new order and vehicles have been created
         self.assertEqual(Order.objects.count(), 1)
@@ -54,7 +54,7 @@ class MyOrderViewTest(TestCase):
             'form-MAX_NUM_FORMS': '1000'
         }
 
-        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        response = self.client.post(reverse('pojazd:my_order'), data=formset_data)
         self.assertEqual(response.status_code, 200) # Check if response is a page refresh
 
         # Check if a new order and vehicles haven't been created
@@ -70,9 +70,9 @@ class MyOrderViewTest(TestCase):
             'form-MAX_NUM_FORMS': '1000',
         } | vehicles
 
-        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        response = self.client.post(reverse('pojazd:my_order'), data=formset_data)
         self.assertEqual(response.status_code, 302) # Check if response is a redirect
-        self.assertEqual(response.url, reverse('files:list')) # Check if it redirects to the correct URL
+        self.assertEqual(response.url, reverse('pojazd:list')) # Check if it redirects to the correct URL
 
         # Check if a new order and vehicles have been created
         self.assertEqual(Order.objects.count(), 1)
@@ -104,9 +104,9 @@ class MyOrderViewTest(TestCase):
             'form-3-comments': 'Test comment',
         }
 
-        response = self.client.post(reverse('files:my_order'), data=formset_data)
+        response = self.client.post(reverse('pojazd:my_order'), data=formset_data)
         self.assertEqual(response.status_code, 302) # Check if response is a redirect
-        self.assertEqual(response.url, reverse('files:list')) # Check if it redirects to the correct URL
+        self.assertEqual(response.url, reverse('pojazd:list')) # Check if it redirects to the correct URL
 
         # Check if a new order and vehicles have been created
         self.assertEqual(Order.objects.count(), 1)
@@ -124,9 +124,9 @@ class MyOrderViewTest(TestCase):
         self.assertEqual(vehicle_2.pk, 2)
 
     def test_my_order_view_get(self):
-        response = self.client.get(reverse('files:my_order'))
+        response = self.client.get(reverse('pojazd:my_order'))
         self.assertEqual(response.status_code, 200) # Check if response is successful
-        self.assertTemplateUsed(response, 'files/my_order.html') # Check if the correct template is used
+        self.assertTemplateUsed(response, 'pojazd/my_order.html') # Check if the correct template is used
         self.assertIsInstance(response.context['my_order_formset'], MyOrderFormSet) # Check if the formset is passed to the template
 
 
@@ -152,7 +152,7 @@ class OrdersToDoViewTest(TestCase):
         self.vehicle7_e = Vehicle.objects.create(tr='AB D123', responsible_person=self.user2, status='e', order=self.order_e)
         self.vehicle8_e = Vehicle.objects.create(tr='XY D789', responsible_person=self.user2, status='e', order=self.order_e)
 
-        self.url = reverse('files:orders_to_do', args=['a'])
+        self.url = reverse('pojazd:orders_to_do', args=['a'])
 
     def test_view_requires_login(self):
         # Check if not logged user is redirected to login page
@@ -172,7 +172,7 @@ class OrdersToDoViewTest(TestCase):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'files/orders_to_do.html')
+        self.assertTemplateUsed(response, 'pojazd/orders_to_do.html')
         self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
         self.assertContains(response, '<td id="do-realizacji">2</td>')
         self.assertContains(response, '<td id="ogółem">2</td>')
@@ -186,10 +186,10 @@ class OrdersToDoViewTest(TestCase):
         self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
         # Check if view properly displays filtered orders (vehicles with status 'e')
         self.client.login(username='testuser', password='testpass')
-        url = reverse('files:orders_to_do', args=['e'])
+        url = reverse('pojazd:orders_to_do', args=['e'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'files/orders_to_do.html')
+        self.assertTemplateUsed(response, 'pojazd/orders_to_do.html')
         self.assertContains(response, f'Zamówienie nr {self.order_e.id}')
         self.assertContains(response, '<td id="do-realizacji">0</td>')
         self.assertContains(response, '<td id="ogółem">2</td>')
@@ -227,7 +227,7 @@ class OrderDetailsViewTest(TestCase):
         self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='a', order=self.order)
         self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order)
 
-        self.url = reverse('files:order_details', args=['1'])
+        self.url = reverse('pojazd:order_details', args=['1'])
 
     def test_view_requires_login(self):
         response = self.client.get(self.url)
@@ -238,10 +238,10 @@ class OrderDetailsViewTest(TestCase):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403) # TODO incorect status
+        # self.assertContains(response, 'Nie masz dostępu do tej zawartości')
         # self.assertRedirects(response, '/accounts/login/?next=' + self.url)
         # response = self.client.get('/accounts/login/?next=' + self.url)
         # self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Nie masz dostępu do tej zawartości')
 
     def test_view_display_all_files(self):
         self.user.user_permissions.add(Permission.objects.get(codename='change_vehicle'))
@@ -263,7 +263,7 @@ class NotificationContextTest(TestCase):
         self.vehicle1_a = Vehicle.objects.create(tr='AB C123', responsible_person=self.user, status='o', order=self.order, transfer_date=timezone.now())
         self.vehicle2_a = Vehicle.objects.create(tr='XY Z789', responsible_person=self.user, status='o', order=self.order, transfer_date=timezone.now())
 
-        self.url = reverse('files:list')
+        self.url = reverse('pojazd:list')
     
     def test_user2_has_no_notifications(self):
         self.client.login(username='testuser2', password='testpass')
@@ -284,7 +284,7 @@ class ReturnFormViewTest(TestCase):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='testpass')
         self.client.login(username='testuser', password='testpass')
-        self.url = reverse('files:return')
+        self.url = reverse('pojazd:return')
 
         self.order = Order.objects.create(order_date=timezone.now(), orderer=self.user)
 
@@ -299,7 +299,7 @@ class ReturnFormViewTest(TestCase):
         self.user.user_permissions.add(Permission.objects.get(codename='return_vehicle'))
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'files/return.html')
+        self.assertTemplateUsed(response, 'pojazd/return.html')
 
     def test_return_file(self):
         self.user.user_permissions.add(Permission.objects.get(codename='return_vehicle'))
@@ -312,7 +312,7 @@ class ReturnFormViewTest(TestCase):
             'comments': 'Test comment 1',
             'return_date': self.time,
         }
-        self.client.post(reverse('files:return'), data=form_data)
+        self.client.post(reverse('pojazd:return'), data=form_data)
 
         self.assertEqual(Vehicle.objects.get(tr='AA 1234').status, 'r')
         self.assertEqual(Vehicle.objects.get(tr='AA 1234').returner, self.user)
@@ -329,7 +329,7 @@ class TransferVehicleViewTestCase(TestCase):
                                               order=self.order,
                                               status='o',
                                               transfer_date=timezone.now())
-        self.url = reverse('files:transfer', args=[self.vehicle.pk])
+        self.url = reverse('pojazd:transfer', args=[self.vehicle.pk])
 
     def test_user_permissions(self):
         # Test that a non-owner user can't access the view
@@ -384,19 +384,19 @@ class ListUserVehiclesViewTest(TestCase):
         self.vehicle7 = Vehicle.objects.create(tr='AB D123', responsible_person=self.user2, status='o', order=self.order_2)
         self.vehicle8 = Vehicle.objects.create(tr='XY D789', responsible_person=self.user2, status='e', order=self.order_2)
 
-        self.url = reverse('files:user_list')
+        self.url = reverse('pojazd:user_list')
 
     def test_login_required(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/accounts/login/?next=/files/user_list/')
+        self.assertRedirects(response, '/accounts/login/?next=/pojazd/user_list/')
 
     def test_user_has_only_self_vehicles(self):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'files/user_vehicles.html')
+        self.assertTemplateUsed(response, 'pojazd/user_vehicles.html')
 
         self.assertContains(response, 'AB C123')
         self.assertContains(response, 'XY Z789')
@@ -410,7 +410,7 @@ class ListUserVehiclesViewTest(TestCase):
 
     def test_display_only_awaits_vehicles(self):
         self.client.login(username='testuser', password='testpass')
-        self.url = reverse('files:user_list', args=['a'])
+        self.url = reverse('pojazd:user_list', args=['a'])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
@@ -422,7 +422,7 @@ class ListUserVehiclesViewTest(TestCase):
 
     def test_display_only_returned_vehicles(self):
         self.client.login(username='testuser', password='testpass')
-        self.url = reverse('files:user_list', args=['r'])
+        self.url = reverse('pojazd:user_list', args=['r'])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
@@ -434,7 +434,7 @@ class ListUserVehiclesViewTest(TestCase):
 
     def test_display_only_onloan_vehicles(self):
         self.client.login(username='testuser', password='testpass')
-        self.url = reverse('files:user_list', args=['o'])
+        self.url = reverse('pojazd:user_list', args=['o'])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
@@ -446,7 +446,7 @@ class ListUserVehiclesViewTest(TestCase):
 
     def test_display_only_rejected_vehicles(self):
         self.client.login(username='testuser', password='testpass')
-        self.url = reverse('files:user_list', args=['e'])
+        self.url = reverse('pojazd:user_list', args=['e'])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 

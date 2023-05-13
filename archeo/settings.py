@@ -42,7 +42,7 @@ ALLOWED_HOSTS = ["8cabc402-9646-4e01-87b2-906f89e89e01.id.repl.co", 'archeo-3.ma
 # Application definition
 
 INSTALLED_APPS = [
-    'files.apps.FilesConfig', 
+    'pojazd.apps.PojazdConfig', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,7 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'files.views.notification_context',
+                'pojazd.views.notification_context',
             ],
         },
     },
