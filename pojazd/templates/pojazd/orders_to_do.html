@@ -8,9 +8,9 @@
 <div class="btn-group"></div>
     {% for s, n in abr %}
         {% if status == s %}
-            <a href="/files/orders_to_do/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
+            <a href="/pojazd/orders_to_do/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
         {% else %}
-            <a href="/files/orders_to_do/{{s}}" class="btn btn-primary">{{n}}</a>
+            <a href="/pojazd/orders_to_do/{{s}}" class="btn btn-primary">{{n}}</a>
         {% endif %}
     {% endfor %}
 </div>
@@ -26,7 +26,7 @@
     </thead>
     {% for order in orders %}
     
-    <tr onclick="window.location='http:/files/order_details/{{order.0.id}}/'">
+    <tr onclick="window.location='http:/pojazd/order_details/{{order.0.id}}/'">
         <td>{{forloop.counter}}</td>
         <td>Zamówienie nr {{order.0.id}}</td>
         <td id="do-realizacji">{{order.1}}</td>

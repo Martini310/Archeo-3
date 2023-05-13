@@ -4,11 +4,11 @@
 <h1>Lista zamówień</h1>
 <ul>
     {% for order in order_list %}
-        <li><h3><a href="/files/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></h3></li>
+        <li><h3><a href="/pojazd/order_details/{{order.id}}/">Zamówienie nr {{order.id}}</a></h3></li>
             <ul>
                 {% for vehicle in order.vehicles.all %}
                     <li>
-                        <a href="/files/update/{{vehicle.id}}/">{{vehicle.tr}}</a>
+                        <a href="/pojazd/update/{{vehicle.id}}/">{{vehicle.tr}}</a>
                     </li>
                 {% endfor %}
             </ul>

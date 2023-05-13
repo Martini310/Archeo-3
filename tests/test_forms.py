@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
-from files.forms import MyOrderForm, TransferForm
-from files.models import Vehicle, User
+from pojazd.forms import MyOrderForm, TransferForm
+from pojazd.models import Vehicle, User
 from django.utils import timezone
 # Create your tests here.
 

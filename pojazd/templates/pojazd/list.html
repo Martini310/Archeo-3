@@ -6,7 +6,7 @@
       <h2><strong>WSZYSTKIE TECZKI</strong></h2><br>
     </div>
     <form 
-        hx-get="{% url 'files:search' %}"
+        hx-get="{% url 'pojazd:search' %}"
         hx-target="#search-results"
         hx-swap="outerHTML"
         hx-trigger="submit, input delay:0.3s"
@@ -41,9 +41,9 @@
         </div>
     </form>
     
-    {% include 'files/search_results.html' %}
+    {% include 'pojazd/search_results.html' %}
 
-    <script type="text/javascript" src="{% static 'files/htmx.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'pojazd/htmx.min.js' %}"></script>
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {
             event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';

@@ -12,7 +12,7 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for vehicle in transfers %}
         <div class="col">
-            <form action={% url 'files:accept' vehicle.id %} method=POST>
+            <form action={% url 'pojazd:accept' vehicle.id %} method=POST>
             {% csrf_token %}
               <div class="card text-bg-light mb-3" style="max-width: 18rem;">
                 <div class="card-header">Od: {{ vehicle.responsible_person.username }}</div>
