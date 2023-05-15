@@ -42,7 +42,9 @@ ALLOWED_HOSTS = ["8cabc402-9646-4e01-87b2-906f89e89e01.id.repl.co", 'archeo-3.ma
 # Application definition
 
 INSTALLED_APPS = [
-    'pojazd.apps.PojazdConfig', 
+    'pojazd.apps.PojazdConfig',
+    'kierowca.apps.KierowcaConfig',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
