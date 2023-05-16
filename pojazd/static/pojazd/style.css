@@ -70,3 +70,8 @@ h2 {
   left: 0;
   z-index: 1;
 }
+
+.card-link {
+  text-decoration: none;
+  color: inherit;
+}

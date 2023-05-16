@@ -76,29 +76,29 @@
         HOME VIEW
         <div class="container">
           <div class="card-group">
-            <div class="row row-cols-1 row-cols-md-2 g-5">
+            <div class="row row-cols-1 row-cols-md-3 g-5">
               <div class="col" style="background-color: white">
                 <div class="card">
-                  <a href="pojazd/list">
-                    <span class="linkSpanner">
-                      <img src="{% static 'pojazd/car.png' %}" class="card-img-top" alt="CAR">
-                        <div class="card-body">
-                          <h5 class="card-title">Pojazd</h5>
-                          <p class="card-text">Zamów lub przekaż teczki pojazdu.</p>
-                          <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-                        </div>
-                    </span>
+                  <a href="pojazd/list" class="card-link">
+                    <img src="{% static 'pojazd/car.png' %}" class="card-img-top" alt="CAR">
+                    <div class="card-body">
+                      <h5 class="card-title">Pojazd</h5>
+                      <p class="card-text">Zamów lub przekaż teczki pojazdów.</p>
+                      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                    </div>
                   </a>
                 </div>
               </div>
               <div class="col">
                 <div class="card">
-                  <img src="{% static 'pojazd/driver.png' %}" class="card-img-top" alt="DRIVER">
-                  <div class="card-body">
-                    <h5 class="card-title">Kierowca</h5>
-                    <p class="card-text">Tu powstaje aplikacja do spraw związanych z kierowcami</p>
-                    <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-                  </div>
+                  <a href="{% url 'kierowca:list' %}" class="card-link">
+                    <img src="{% static 'pojazd/driver.png' %}" class="card-img-top" alt="DRIVER">
+                    <div class="card-body">
+                      <h5 class="card-title">Kierowca</h5>
+                      <p class="card-text">Zamów lub przekaż teczki kierowców.</p>
+                      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                    </div>
+                  </a>
                 </div>
               </div>
             </div>

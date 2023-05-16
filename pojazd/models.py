@@ -40,6 +40,7 @@ class Vehicle(models.Model):
             return f"Teczka {self.tr} zamówiona przez: {self.responsible_person} została odrzucona. Nr zamówienia: {self.order.id}."
     
     def get_fields(self):
+        """Get all name and values from model fields"""
         return [(field.verbose_name, getattr(self,field.name)) for field in Vehicle._meta.fields]
     
     @register.filter

@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 # Create your models here.
 
-class Order(models.Model):
+class DriverOrder(models.Model):
     order_date = models.DateTimeField('Data zamówienia', auto_now_add=True)
     orderer = models.ForeignKey(User, related_name="dirver_orders", on_delete=models.RESTRICT, verbose_name='Zamawiający')
 
@@ -31,7 +31,7 @@ class Driver(models.Model):
         ('e', 'Odrzucona') # e - Rejected/error
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
-    order = models.ForeignKey(Order, related_name="drivers", on_delete=models.SET_NULL, null=True, verbose_name='Zamówienie')
+    order = models.ForeignKey(DriverOrder, related_name="drivers", on_delete=models.SET_NULL, null=True, verbose_name='Zamówienie')
     returner = models.ForeignKey(User, related_name='drivers_returner', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Zwracający')
 
 
@@ -47,7 +47,7 @@ class Driver(models.Model):
             control_sum += int(number) * multipliers[index]
 
         if 10 - (control_sum % 10) != int(self.pesel[-1]):
-            raise ValidationError('Błędna cyfra kontrolna')
+            raise ValidationError('PESEL: Błędna cyfra kontrolna')
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -56,4 +56,6 @@ class Driver(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name}. Pesel: {self.pesel}'
     
-
+    def get_fields(self):
+        return [(field.verbose_name, getattr(self,field.name)) for field in Driver._meta.fields]
+    

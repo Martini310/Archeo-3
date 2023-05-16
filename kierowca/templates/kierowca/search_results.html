@@ -1,0 +1,89 @@
+<div id="search-results" class='container'>
+    <i>Znalezionych teczek: <b>{{ driver_list.count }}</b></i>
+    <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>PESEL</th>
+                <th>Pobrał</th>
+                <th>Data Pobrania</th>
+                <th>Status</th>
+                <th>Edytuj</th>
+                <th>Szczegóły</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for driver in driver_list %}
+            
+            {% if driver.status == 'r' %}
+            <tr class="table-success">
+            {% elif driver.status == 'o' %}
+            <tr class="table-warning">
+            {% elif driver.status == 'e' %}
+            <tr class="table-danger">
+            {% else %}    
+            <tr class="table-light">
+            {% endif %}
+                
+            
+                <td>{{ driver.id }}</td>
+                <td class="fw-bolder">{{ driver.first_name }}</td>
+                <td class="fw-bolder">{{ driver.last_name }}</td>
+                <td class="fw-bolder">{{ driver.pesel }}</td>
+                <td>{{ driver.responsible_person.username }}</td>
+                <td>{{ driver.transfer_date }}</td>
+                <td>{{ driver.LOAN_STATUS|get_item:driver.status }}</td>
+                <td>
+                    <a class='btn btn-primary' href="/pojazd/update/{{driver.id}}/">Edytuj</a>
+                </td>
+                <td>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ forloop.counter }}">
+                        Szczegóły
+                    </button>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ driver.tr }}</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {{ driver }}
+                                <table class="table">
+                                    <tbody>
+                                      {% for name, value in driver.get_fields %}
+                                      <tr>
+                                        <th scope="row">{{ name }}</th>
+                                        <td>
+                                        {% if value is None %}
+                                            ---
+                                        {% elif name == 'status' %}
+                                            {{ driver.LOAN_STATUS|get_item:value }}
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
+                                            </td>
+                                      </tr>
+                                      {% endfor %}
+                                    </tbody>
+                                </table>                          
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>

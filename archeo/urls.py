@@ -20,6 +20,7 @@ from pojazd import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pojazd/', include('pojazd.urls')),
+    path('kierowca/', include('kierowca.urls')),
     path('', views.HomeView.as_view()),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
