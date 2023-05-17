@@ -8,6 +8,31 @@ function handleInput(e) {
     e.target.selectionEnd = se;
     }
 
+function peselToBirthDate(element) {
+    var pesel = element.value
+    if (pesel.length == 11){
+        if (pesel[2] > 1) {
+            var month = pesel.slice(2,4) - 20;
+            if (month < 10) {
+                month = '0' + month;
+            }
+        }
+        else {
+            var month = pesel.slice(2,4);
+        }
+        if (pesel[2] > 1) {
+            var year = 2000 + Number(pesel.slice(0,2));
+        }
+        else {
+            var year = 1900 + Number(pesel.slice(0,2));
+        }
+        var day = pesel.slice(4,6);
+        var birth_date = year + '-' + month + '-' + day;
+        var birthDateID = element.id.slice(0,-5) + 'birth_date';
+        document.getElementById(birthDateID).value = birth_date;
+    }
+}
+
 
 function clicked(e){
     // create a list with values from inputs

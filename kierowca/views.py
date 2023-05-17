@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from .models import DriverOrder, Driver, User
-from .forms import AddDriverForm
+from .forms import AddDriverForm, MyDriverOrderFormSet
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 from django.urls import reverse_lazy
 
 # Create your views here.
@@ -41,4 +43,37 @@ class AddDriver(LoginRequiredMixin, CreateView):
     form_class = AddDriverForm
 
     success_url = reverse_lazy('kierowca:list')
-    # permission_required = 'kierowca.add_driver'
+    # TODO permission_required = 'kierowca.add_driver'
+
+
+class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
+    """ View to create a new DriverOrder. """
+    template_name = 'kierowca/my_driverorder.html'
+    success_message = "sukces"
+
+    def get(self, *args, **kwargs):
+        formset = MyDriverOrderFormSet()
+        return self.render_to_response({'my_order_formset': formset})
+
+    # Define method to handle POST request
+    def post(self, request, *args, **kwargs):
+        formset = MyDriverOrderFormSet(data=self.request.POST)
+
+        # Check if submitted forms are valid
+        if formset.is_valid():
+            # if form is not empty create new order with vehicles from form
+            if any(len(row) > 0 for row in formset.cleaned_data):
+                user = request.user
+                order = DriverOrder.objects.create(orderer=user)
+
+                Driver.objects.bulk_create([Driver(first_name=row['first_name'],
+                                                    last_name=row['last_name'],
+                                                    pesel=row['pesel'],
+                                                    birth_date=['birth_date'],
+                                                    responsible_person=user,
+                                                    order=order,
+                                                    comments=row['comments']) 
+                                                     for row in formset.cleaned_data if row.get('tr') is not None])
+                messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
+                return redirect(reverse_lazy("kierowca:list"))
+        return self.render_to_response({'my_order_formset': formset})

@@ -1,7 +1,10 @@
+# pylint: disable=no-member
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from kierowca.models import DriverOrder, Driver
+from django.utils import timezone
+from datetime import datetime
 
 class ViewsTestCase(TestCase):
     def setUp(self):
@@ -72,3 +75,40 @@ class ViewsTestCase(TestCase):
         self.assertContains(response, 'John')
         self.assertNotContains(response, 'Jane')
 
+
+class AddDriverViewTest(TestCase):
+    def test_add_driver(self):
+        # Create a test user
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.order = DriverOrder.objects.create(orderer=self.user)
+        self.client.login(username='testuser', password='testpassword')
+        self.time = datetime(2002, 5, 15)
+
+        # Define the URL for the add driver view
+        url = reverse('kierowca:add')
+
+        # Simulate a POST request with form data
+        data = {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'pesel': '12345678903', 
+            'order': self.order.id,
+            'birth_date': self.time.date(),
+            'responsible_person': self.user.pk,
+        }
+        response = self.client.post(url, data, follow=True)
+
+        # Assert that the driver was created successfully
+        self.assertEqual(response.status_code, 200)  # Check for a redirect
+        self.assertEqual(Driver.objects.count(), 1)
+
+        # Assert that the driver's attributes are correct
+        driver = Driver.objects.first()
+        self.assertEqual(driver.first_name, 'John')
+        self.assertEqual(driver.last_name, 'Doe')
+        self.assertEqual(driver.pesel, '12345678903')
+        self.assertEqual(driver.birth_date, self.time.date())
+        self.assertEqual(driver.order.id, 1)
+        self.assertEqual(driver.responsible_person, self.user)
+        # Assert the redirect URL after successful creation
+        self.assertRedirects(response, reverse('kierowca:list'))
