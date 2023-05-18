@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import DriverOrder, Driver, User
 from .forms import AddDriverForm, MyDriverOrderFormSet
 from django.db.models import Q
@@ -53,7 +53,7 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
 
     def get(self, *args, **kwargs):
         formset = MyDriverOrderFormSet()
-        return self.render_to_response({'my_order_formset': formset})
+        return self.render_to_response({'my_driverorder_formset': formset})
 
     # Define method to handle POST request
     def post(self, request, *args, **kwargs):
@@ -61,19 +61,22 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
 
         # Check if submitted forms are valid
         if formset.is_valid():
-            # if form is not empty create new order with vehicles from form
+            # if form is not empty create new order with divers from form
             if any(len(row) > 0 for row in formset.cleaned_data):
                 user = request.user
                 order = DriverOrder.objects.create(orderer=user)
-
-                Driver.objects.bulk_create([Driver(first_name=row['first_name'],
+                print(formset.cleaned_data)
+                
+                Driver.objects.bulk_create([Driver(first_name=row.get('first_name'),
                                                     last_name=row['last_name'],
                                                     pesel=row['pesel'],
-                                                    birth_date=['birth_date'],
+                                                    birth_date=row['birth_date'],
                                                     responsible_person=user,
                                                     order=order,
                                                     comments=row['comments']) 
-                                                     for row in formset.cleaned_data if row.get('tr') is not None])
+                                                     for row in formset.cleaned_data if row.get('last_name') is not None])
                 messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
                 return redirect(reverse_lazy("kierowca:list"))
-        return self.render_to_response({'my_order_formset': formset})
+        
+        messages.warning(request, 'Wprowadź przynajmniej jedno zamówienie')
+        return self.render_to_response({'my_driverorder_formset': formset})

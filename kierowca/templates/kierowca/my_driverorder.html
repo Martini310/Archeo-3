@@ -7,19 +7,19 @@
 <form class="my-order" id="form-container" method="POST">
     {% csrf_token %}
 
-    {{ my_order_formset.management_form }}
-    {% for form in my_order_formset %}
+    {{ my_driverorder_formset.management_form }}
+    {% for form in my_driverorder_formset %}
         <div class="input-group mb-2" id="tr-div">
         <span class="input-group-text" id="id_form-{{forloop.counter|add:'-1'}}-lp">{{forloop.counter}}</span>
         {% for field in form %}
             {{field}}
         {% endfor %}
         </div>
-        {{ form.errors.tr }}
+        {{ form.errors }}
     {% endfor %}
     <div class='container' id="buttons">
         <button class="btn btn-secondary" id="add-form" type="button">Dodaj pole</button>
-        <input class="btn btn-primary right-button" type="submit" value="Zamów" onclick="clicked(event)">
+        <input class="btn btn-primary right-button" type="submit" value="Zamów">
     </div>
 </form>
 

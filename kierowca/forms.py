@@ -22,13 +22,13 @@ class AddDriverForm(forms.ModelForm):
 class MyDriverOrderForm(forms.Form):
     """ Form for MyDriverOrderView"""
     first_name = forms.CharField(label='',
-                         max_length=10,
+                         max_length=50,
                          widget=forms.TextInput(attrs={'placeholder': 'Imię',
                                                        'class': 'form-control', 
                                                        'oninput':"handleInput(event)"}))
     
     last_name = forms.CharField(label='',
-                         max_length=10,
+                         max_length=100,
                          widget=forms.TextInput(attrs={'placeholder': 'Nazwisko',
                                                        'class': 'form-control', 
                                                        'oninput':"handleInput(event)"}))
@@ -42,13 +42,13 @@ class MyDriverOrderForm(forms.Form):
     
     kk = forms.CharField(label='',
                          max_length=10,
+                         required=False,
                          widget=forms.TextInput(attrs={'placeholder': 'Numer k/k',
                                                        'class': 'form-control', 
                                                        'oninput':"handleInput(event)"}))
     
-    birth_date = forms.CharField(label='',
-                         max_length=10,
-                         widget=forms.TextInput(attrs={'placeholder': 'Data urodzenia',
+    birth_date = forms.DateField(label='',
+                         widget=forms.DateInput(attrs={'placeholder': 'Data urodzenia',
                                                        'class': 'form-control', 
                                                        }))
     
@@ -58,7 +58,7 @@ class MyDriverOrderForm(forms.Form):
                                widget=forms.TextInput(attrs={'placeholder': 'Uwagi',
                                                              'class': 'form-control'}))
 
-    def clean_tr(self):
+    def clean_pesel(self):
         """ Check if driver is already taken or ordered and show error if is. """
         pesel = self.cleaned_data['pesel']
         awaits = models.Driver.objects.filter(pesel=pesel, status__in='a')
