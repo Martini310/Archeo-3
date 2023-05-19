@@ -6,7 +6,7 @@ from kierowca.models import DriverOrder, Driver
 from django.utils import timezone
 from datetime import datetime
 
-class ViewsTestCase(TestCase):
+class ListViewTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='testpassword')
@@ -112,3 +112,67 @@ class AddDriverViewTest(TestCase):
         self.assertEqual(driver.responsible_person, self.user)
         # Assert the redirect URL after successful creation
         self.assertRedirects(response, reverse('kierowca:list'))
+
+
+class MyDriverOrderViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+        self.url = reverse('kierowca:my_driverorder')
+
+    def test_get_request(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/my_driverorder.html')
+        self.assertContains(response, 'Zamówienie na teczki')
+
+    def test_post_request_valid_data(self):
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-0-first_name': 'John',
+            'form-0-last_name': 'Doe',
+            'form-0-pesel': '12345678903',
+            'form-0-birth_date': '2000-01-01',
+            'form-0-comments': 'Some comments',
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('kierowca:list'))
+
+        # Verify that the order and driver were created
+        self.assertTrue(DriverOrder.objects.exists())
+        self.assertTrue(Driver.objects.exists())
+
+        order = DriverOrder.objects.first()
+        driver = Driver.objects.first()
+
+        self.assertEqual(driver.first_name, 'John')
+        self.assertEqual(driver.last_name, 'Doe')
+        self.assertEqual(driver.pesel, '12345678903')
+        self.assertEqual(driver.birth_date.strftime('%Y-%m-%d'), '2000-01-01')
+        self.assertEqual(driver.comments, 'Some comments')
+        self.assertEqual(driver.order, order)
+
+    def test_post_request_invalid_data(self):
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1000',
+            'form-0-first_name': 'John',
+            'form-0-last_name': 'Doe',
+            'form-0-pesel': '12345',  # Invalid PESEL
+            'form-0-birth_date': '2000-01-01',
+            'form-0-comments': 'Some comments',
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/my_driverorder.html')
+        self.assertFormsetError(response, 'my_driverorder_formset', 0, 'pesel', 'Pesel musi mieć 11 znaków')
+
+        # Verify that no order or driver was created
+        self.assertFalse(DriverOrder.objects.exists())
+        self.assertFalse(Driver.objects.exists())

@@ -67,7 +67,7 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
             if any(len(row) > 0 for row in formset.cleaned_data):
                 user = request.user
                 order = DriverOrder.objects.create(orderer=user)
-                print(formset.cleaned_data)
+                # print(formset.cleaned_data)
                 
                 Driver.objects.bulk_create([Driver(first_name=row.get('first_name'),
                                                     last_name=row['last_name'],

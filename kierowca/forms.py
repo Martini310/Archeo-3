@@ -60,13 +60,6 @@ class MyDriverOrderForm(forms.Form):
     def clean_pesel(self):
         # """ Check if driver is already taken or ordered and show error if is. """
         pesel = self.cleaned_data['pesel']
-        # awaits = models.Driver.objects.filter(pesel=pesel, status__in='a')
-        # on_loan = models.Driver.objects.filter(pesel=pesel, status__in='o')
-        # if awaits:
-        #     raise ValidationError("Teczka jest już zamówiona")
-        # if on_loan:
-        #     raise ValidationError("Teczka jest już pobrana")
-
         models.pesel_validation(pesel)
         return pesel
 
