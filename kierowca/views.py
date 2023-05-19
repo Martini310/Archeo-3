@@ -1,12 +1,13 @@
+# pylint: disable=no-member
 from django.shortcuts import render, redirect
-from .models import DriverOrder, Driver, User
-from .forms import AddDriverForm, MyDriverOrderFormSet
-from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.views.generic import CreateView, TemplateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
+from .forms import AddDriverForm, MyDriverOrderFormSet
+from .models import DriverOrder, Driver, User
 
 # Create your views here.
 def list_view(request):
@@ -37,11 +38,12 @@ def _search_drivers(request):
     return drivers, search or ""
 
 
-class AddDriver(LoginRequiredMixin, CreateView):
+class AddDriver(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     """ A View to create a new instance of vehicle. """
     model = Driver
     form_class = AddDriverForm
 
+    success_message = "zapisano!"
     success_url = reverse_lazy('kierowca:list')
     # TODO permission_required = 'kierowca.add_driver'
 
@@ -78,5 +80,5 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
                 messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
                 return redirect(reverse_lazy("kierowca:list"))
         
-        messages.warning(request, 'Wprowadź przynajmniej jedno zamówienie')
+        messages.warning(request, 'Wprowadź przynajmniej jedno zamówienie lub popraw błędy')
         return self.render_to_response({'my_driverorder_formset': formset})

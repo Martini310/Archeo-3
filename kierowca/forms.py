@@ -49,8 +49,7 @@ class MyDriverOrderForm(forms.Form):
     
     birth_date = forms.DateField(label='',
                          widget=forms.DateInput(attrs={'placeholder': 'Data urodzenia',
-                                                       'class': 'form-control', 
-                                                       }))
+                                                       'class': 'form-control'}))
     
     comments = forms.CharField(label='',
                                max_length=100,
@@ -59,14 +58,16 @@ class MyDriverOrderForm(forms.Form):
                                                              'class': 'form-control'}))
 
     def clean_pesel(self):
-        """ Check if driver is already taken or ordered and show error if is. """
+        # """ Check if driver is already taken or ordered and show error if is. """
         pesel = self.cleaned_data['pesel']
-        awaits = models.Driver.objects.filter(pesel=pesel, status__in='a')
-        on_loan = models.Driver.objects.filter(pesel=pesel, status__in='o')
-        if awaits:
-            raise ValidationError("Teczka jest już zamówiona")
-        if on_loan:
-            raise ValidationError("Teczka jest już pobrana")
+        # awaits = models.Driver.objects.filter(pesel=pesel, status__in='a')
+        # on_loan = models.Driver.objects.filter(pesel=pesel, status__in='o')
+        # if awaits:
+        #     raise ValidationError("Teczka jest już zamówiona")
+        # if on_loan:
+        #     raise ValidationError("Teczka jest już pobrana")
+
+        models.pesel_validation(pesel)
         return pesel
 
 
