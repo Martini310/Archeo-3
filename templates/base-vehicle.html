@@ -20,9 +20,33 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link active" aria-current="page" href={% url "pojazd:list" %}>Pojazd</a>
-              <a class="nav-link active" aria-current="page" href={% url "kierowca:list" %}>Kierowca</a>
-          
+              <a class="nav-link active" aria-current="page" href={% url "pojazd:list" %}>List</a>
+              {% if perms.pojazd.add_vehicle %}
+              <a class="nav-link" href={% url "pojazd:add" %}>Add</a>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <a class="nav-link" href={% url "pojazd:my_order" %}>My Order</a>
+              {% endif %}
+              {% if perms.pojazd.view_order %}
+              <a class="nav-link position-relative" href="/pojazd/orders_to_do/a">Orders to do
+                {% if notifications.count_orders_to_do %}
+                <span class="position-absolute top-10 start-110 translate-middle badge rounded-pill bg-danger">
+                  {{ notifications.count_orders_to_do }}
+                <span class="visually-hidden">New alerts</span></span>
+                {% endif %}
+              </a>
+              {% endif %}
+              {% if perms.pojazd.return_vehicle %}
+              <a class="nav-link" href="/pojazd/return">Return</a>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <a class="nav-link position-relative" href="/pojazd/user_list">Moje teczki
+                {% if notifications.transfers %}
+                  <span class="position-absolute top-20 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                  <span class="visually-hidden">New alerts</span></span>
+                {% endif %}
+              </a>
+              {% endif %}
             </div>
             <div class="navbar-nav ms-auto">
               {% if user.is_authenticated %}
@@ -49,6 +73,7 @@
 
       {% block content %}
         
+        HOME VIEW
         <div class="container">
           <div class="card-group">
             <div class="row row-cols-1 row-cols-md-3 g-5">

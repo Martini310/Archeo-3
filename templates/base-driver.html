@@ -20,9 +20,33 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link active" aria-current="page" href={% url "pojazd:list" %}>Pojazd</a>
-              <a class="nav-link active" aria-current="page" href={% url "kierowca:list" %}>Kierowca</a>
-          
+              <a class="nav-link active" aria-current="page" href={% url "kierowca:list" %}>Lista</a>
+              {% if perms.kierowca.add_driver %}
+              <a class="nav-link" href={% url "kierowca:add" %}>Dodaj</a>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <a class="nav-link" href={% url "kierowca:my_driverorder" %}>Dodaj Zamówienie</a>
+              {% endif %}
+              {% if perms.kierowca.view_order %}
+              <a class="nav-link position-relative" href="/kierowca/orders_to_do/a">Orders to do
+                {% if notifications.count_orders_to_do %}
+                <span class="position-absolute top-10 start-110 translate-middle badge rounded-pill bg-danger">
+                  {{ notifications.count_orders_to_do }}
+                <span class="visually-hidden">New alerts</span></span>
+                {% endif %}
+              </a>
+              {% endif %}
+              {% if perms.kierowca.return_driver %}
+              <a class="nav-link" href="/kierowca/return">Zwróć</a>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <a class="nav-link position-relative" href="/kierowca/user_list">Moje teczki
+                {% if notifications.transfers %}
+                  <span class="position-absolute top-20 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                  <span class="visually-hidden">New alerts</span></span>
+                {% endif %}
+              </a>
+              {% endif %}
             </div>
             <div class="navbar-nav ms-auto">
               {% if user.is_authenticated %}
@@ -49,36 +73,6 @@
 
       {% block content %}
         
-        <div class="container">
-          <div class="card-group">
-            <div class="row row-cols-1 row-cols-md-3 g-5">
-              <div class="col" style="background-color: white">
-                <div class="card">
-                  <a href="pojazd/list" class="card-link">
-                    <img src="{% static 'pojazd/car.png' %}" class="card-img-top" alt="CAR">
-                    <div class="card-body">
-                      <h5 class="card-title">Pojazd</h5>
-                      <p class="card-text">Zamów lub przekaż teczki pojazdów.</p>
-                      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-                    </div>
-                  </a>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card">
-                  <a href="{% url 'kierowca:list' %}" class="card-link">
-                    <img src="{% static 'pojazd/driver.png' %}" class="card-img-top" alt="DRIVER">
-                    <div class="card-body">
-                      <h5 class="card-title">Kierowca</h5>
-                      <p class="card-text">Zamów lub przekaż teczki kierowców.</p>
-                      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       {% endblock content %}
         
 </body>
