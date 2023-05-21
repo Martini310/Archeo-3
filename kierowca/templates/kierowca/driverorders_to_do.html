@@ -1,0 +1,40 @@
+{% extends 'base-driver.html' %}
+
+{% block content %}
+<div class="my-order-header">
+  <h2><strong>List zamówień do realizacji</strong></h2><br>
+</div>
+
+<div class="btn-group">
+    {% for s, n in abr %}
+        {% if status == s %}
+            <a href="/kierowca/orders_to_do/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
+        {% else %}
+            <a href="/kierowca/orders_to_do/{{s}}" class="btn btn-primary">{{n}}</a>
+        {% endif %}
+    {% endfor %}
+</div>
+
+
+<table class="table table-striped table-secondary table-hover text-center">
+    <thead>
+        <th>#</th>
+        <th>Nr zamówienia</th>
+        <th>Teczki do realizacji</th>
+        <th>Teczki ogółem</th>
+        <th>Zamawiający</th>
+    </thead>
+    {% for order in orders %}
+    
+    <tr onclick="window.location='http:/kierowca/order_details/{{order.0.id}}/'">
+        <td>{{forloop.counter}}</td>
+        <td>Zamówienie nr {{order.0.id}}</td>
+        <td id="do-realizacji">{{order.1}}</td>
+        <td id="ogółem">{{ order.0.vehicles.all.count }}</td>
+        <td>{{order.0.orderer}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock content %}
+    

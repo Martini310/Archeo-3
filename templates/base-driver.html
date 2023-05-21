@@ -27,7 +27,7 @@
               {% if user.is_authenticated %}
               <a class="nav-link" href={% url "kierowca:my_driverorder" %}>Dodaj Zamówienie</a>
               {% endif %}
-              {% if perms.kierowca.view_order %}
+              {% comment %} {% if perms.kierowca.view_order %} {% endcomment %}
               <a class="nav-link position-relative" href="/kierowca/orders_to_do/a">Orders to do
                 {% if notifications.count_orders_to_do %}
                 <span class="position-absolute top-10 start-110 translate-middle badge rounded-pill bg-danger">
@@ -35,7 +35,7 @@
                 <span class="visually-hidden">New alerts</span></span>
                 {% endif %}
               </a>
-              {% endif %}
+              {% comment %} {% endif %} {% endcomment %}
               {% if perms.kierowca.return_driver %}
               <a class="nav-link" href="/kierowca/return">Zwróć</a>
               {% endif %}

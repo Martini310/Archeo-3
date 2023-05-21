@@ -1,11 +1,12 @@
 # pylint: disable=no-member
 from django.shortcuts import render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, ListView, View
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.utils import timezone
 from .forms import AddDriverForm, MyDriverOrderFormSet
 from .models import DriverOrder, Driver, User
 
@@ -82,3 +83,53 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         
         messages.warning(request, 'Wprowadź przynajmniej jedno zamówienie lub popraw błędy')
         return self.render_to_response({'my_driverorder_formset': formset})
+
+
+class DriverOrdersToDoView(LoginRequiredMixin, ListView):
+    """ A View with listed all Driver orders divides into status categories. """
+    model = DriverOrder
+    template_name = 'driverorders_to_do.html'
+    # permission_required = 'kierowca.view_order'
+
+    def get(self, request, status):
+        orders = DriverOrder.objects.all()
+        orders = [(order, order.drivers.filter(status='a').count) for order in orders if any(
+                [driver.status for driver in order.drivers.all() if driver.status == status])]
+        abr = Driver.LOAN_STATUS
+        return render(request, 'kierowca/driverorders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
+
+
+class OrderDetails(LoginRequiredMixin, SuccessMessageMixin, View):
+    """
+    A view to update a particular Order, save or reject Driver in the Order.
+    URL: 'order_details/<int:pk>/'
+    """
+    model = Driver
+    template_name = 'kierowca/order_details.html'
+
+    # permission_required = 'kierowca.change_driver'
+    success_message = "Zmiany w zamówieniu zostały zapisane prawidłowo."
+    # permission_denied_message = "Nie masz dostępu do tej zawartości."
+    
+    def get(self, request, pk):
+        order = DriverOrder.objects.get(pk=pk)
+        statuses = dict(Driver.LOAN_STATUS)
+        return render(request, 'kierowca/order_details.html', context={'order': order, 'statuses': statuses})
+    
+    def post(self, request, pk):
+        # List of ids from Drivers with checked checkboxes
+        order = DriverOrder.objects.get(pk=pk)
+        statuses = dict(Driver.LOAN_STATUS)
+        id_list = request.POST.getlist('boxes')
+        if id_list:
+            if 'save' in request.POST:
+                for input_id in id_list:
+                    Driver.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
+            elif 'reject' in request.POST:
+                for input_id in id_list:
+                    Driver.objects.filter(pk=int(input_id)).update(status='e')
+
+            return redirect('kierowca:list')
+        else:
+            messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
+            return render(request, 'kierowca/order_details.html', context={'order': order, 'statuses': statuses})
