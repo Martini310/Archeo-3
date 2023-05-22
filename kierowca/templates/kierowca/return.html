@@ -1,0 +1,31 @@
+{% extends 'base-driver.html' %}
+
+{% block content %}
+{% load static %}
+
+<div class="my-order-header">
+<h2><strong>ZWROT TECZKI</strong></h2>
+</div>
+
+<div id="zwrot">
+<form class='my-order' action="" method="POST">
+    {% csrf_token %}
+    <strong>{{form.as_p}}</strong>
+
+    <input class="btn btn-primary right-button" type="submit" value="Zatwierdź">
+    <label><input type="checkbox" onclick="noPesel()" id="nopesel">Brak PESEL</input></label>
+</form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#id_first_name').hide();
+        $("label[for='id_first_name']").hide();
+        $('#id_last_name').hide();
+        $("label[for='id_last_name']").hide();
+        $('#id_birth_date').hide();
+        $("label[for='id_birth_date']").hide();
+    })
+</script>
+
+{% endblock content %}

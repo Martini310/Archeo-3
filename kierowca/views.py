@@ -2,12 +2,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
-from django.views.generic import CreateView, TemplateView, ListView, View
+from django.views.generic import CreateView, TemplateView, ListView, View, FormView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .forms import AddDriverForm, MyDriverOrderFormSet
+from .forms import AddDriverForm, MyDriverOrderFormSet, ReturnDriverForm
 from .models import DriverOrder, Driver, User
 
 # Create your views here.
@@ -133,3 +133,45 @@ class OrderDetails(LoginRequiredMixin, SuccessMessageMixin, View):
         else:
             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
             return render(request, 'kierowca/order_details.html', context={'order': order, 'statuses': statuses})
+
+
+class ReturnDriverFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+    """ A View to return a driver. """
+    form_class = ReturnDriverForm
+    template_name = 'kierowca/return.html'
+    # permission_required = 'kierowca.return_driver'
+
+    success_url = '/kierowca/return/'
+    success_message = "Teczka o numerze %(pesel)s została zwrócona prawidłowo"
+
+    time = timezone.now()
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs() 
+        # Retrieve the value of 'returner' from the session
+        returner_pk = self.request.session.get('returner')
+        if returner_pk:
+            returner = User.objects.get(pk=returner_pk)
+            kwargs['initial'] = {'returner': returner}
+        
+        return kwargs
+
+    def form_valid(self, form):
+        pesel=form.cleaned_data['pesel']
+        if pesel:
+            Driver.objects.filter(pesel=pesel, status='o').update(status='r',
+                                                            returner=form.cleaned_data['returner'],
+                                                            comments=form.cleaned_data['comments'],
+                                                            return_date=self.time)
+        else:
+            Driver.objects.filter(first_name=form.cleaned_data['first_name'],
+                                  last_name=form.cleaned_data['last_name'],
+                                  birth_date=form.cleaned_data['birth_date'],
+                                  status='o').update(status='r',
+                                                    returner=form.cleaned_data['returner'],
+                                                    comments=form.cleaned_data['comments'],
+                                                    return_date=self.time)
+        # Store the value of 'returner' in the session
+        self.request.session['returner'] = form.cleaned_data['returner'].pk
+
+        return super().form_valid(form)

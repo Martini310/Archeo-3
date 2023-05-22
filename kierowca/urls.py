@@ -10,4 +10,5 @@ urlpatterns = [
     path('my_driverorder', views.MyDriverOrderView.as_view(), name='my_driverorder'),
     path('orders_to_do/<str:status>/', views.DriverOrdersToDoView.as_view(), name='driverorders_to_do'),
     path('order_details/<int:pk>/', views.OrderDetails.as_view(), name='order_details'),
+    path('return/', views.ReturnDriverFormView.as_view(), name='return'),
 ]

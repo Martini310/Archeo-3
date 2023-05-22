@@ -82,3 +82,30 @@ function addForm(e){
     totalForms.setAttribute('value', `${formNum+1}`)
 }
     
+
+function noPesel() {
+    if (document.getElementById("id_first_name").style.display == 'none') {
+        $(document).ready(function() {
+            $('#id_first_name').show();
+            $("label[for='id_first_name']").show();
+            $('#id_last_name').show();
+            $("label[for='id_last_name']").show();
+            $('#id_birth_date').show();
+            $("label[for='id_birth_date']").show();
+            $('#id_pesel').hide();
+            $("label[for='id_pesel']").hide();
+        })
+    }
+    else {
+        $(document).ready(function() {
+            $('#id_first_name').hide();
+            $("label[for='id_first_name']").hide();
+            $('#id_last_name').hide();
+            $("label[for='id_last_name']").hide();
+            $('#id_birth_date').hide();
+            $("label[for='id_birth_date']").hide();
+            $('#id_pesel').show();
+            $("label[for='id_pesel']").show();
+        })
+    }
+}
