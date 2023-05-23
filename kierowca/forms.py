@@ -148,3 +148,26 @@ class ReturnDriverForm(forms.ModelForm):
         # this method didn't change it.
         return birth_date
     
+
+class TransferDriverForm(forms.ModelForm):
+    pesel = forms.CharField(max_length=11, disabled=True, required=False)
+    first_name = forms.CharField(max_length=100, disabled=True)
+    last_name = forms.CharField(max_length=100, disabled=True)
+    kk = forms.CharField(max_length=15, disabled=True, required=False)
+    birth_date = forms.DateField(disabled=True)
+    transfer_date = forms.DateField(disabled=True)
+
+    def __init__(self, *args, **kwargs):
+        # Exclude the current logged user from list of users
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        self.fields['transfering_to'].queryset = models.User.objects.exclude(pk=self.user.pk)
+
+    def clean_transfering_to(self):
+        transfering_to = self.cleaned_data['transfering_to']
+        if not transfering_to:
+            raise ValidationError('Wybierz użytkownika')
+        
+    class Meta:
+        model = models.Driver
+        fields = ['first_name', 'last_name', 'pesel', 'kk', 'birth_date', 'transfer_date', 'transfering_to', 'comments']

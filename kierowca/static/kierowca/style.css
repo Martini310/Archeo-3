@@ -1,0 +1,73 @@
+@media print {
+  /* hide everything except the content you want to print */
+  body * {
+    visibility: hidden;
+  }
+  .print-section, .print-section * {
+    visibility: visible;
+  }
+  .btn-success, .btn-success * {
+    visibility: hidden;
+  }
+  .btn-danger, .btn-danger * {
+    visibility: hidden;
+  }
+  .btn-primary, .btn-primary * {
+    visibility: hidden;
+  }
+  /* Using a formula (an + b). Description: 
+  a represents a cycle size, 
+  n is a counter (starts at 0), 
+  and b is an offset value. */
+  th:nth-child(1n+7), td:nth-child(1n+7)  {
+    display: none;
+    visibility: hidden;
+  }
+
+  /* adjust styles for printing */
+  .print-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+
+body {
+background-color: rgb(214, 243, 255);
+}
+
+h2 {
+color: rgb(216, 66, 196);
+
+}
+
+#floatingInput {
+margin-top: 3px;
+}
+
+.my-order {
+margin-top: 60px;
+width:40%; 
+margin-left: auto; 
+margin-right: auto; 
+}
+
+.right-button {
+float: right;
+margin-top: 10px;
+}
+
+.my-order-header {
+margin-top: 30px;
+width:60%; 
+margin-left: auto; 
+margin-right: auto; 
+text-align: center;
+}
+
+.card-link {
+text-decoration: none;
+color: inherit;
+}

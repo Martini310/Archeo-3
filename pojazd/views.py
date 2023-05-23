@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import ReturnForm, MyOrderFormSet, TransferForm, AddVehicleForm
 from .models import Order, Vehicle, User
+from kierowca.models import Driver, DriverOrder
 
 # Create your views here.
 
@@ -18,12 +19,19 @@ def notification_context(request):
     transfers = Vehicle.objects.filter(transfering_to=request.user.id)
     orders = len([order for order in Order.objects.all() if any(
         [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == 'a'])]) or 0
+    
+    driver_transfers = Driver.objects.filter(transfering_to=request.user.id)
+    driver_orders = len([order for order in DriverOrder.objects.all() if any(
+        [driver.status for driver in order.drivers.all() if driver.status == 'a'])]) or 0
     # The return value must be a dict, and any values in that dict
     # are added to the template context for all templates.
     # You might want to use more unique names here, to avoid having these
     # variables clash with variables added by a view.  For example, `count` could easily
     # be used elsewhere.
-    return {'notifications': {'transfers': transfers, 'count_orders_to_do': orders}}
+    return {'notifications': {'transfers': transfers, 
+                              'count_orders_to_do': orders, 
+                              'driver_transfers': driver_transfers, 
+                              'count_driver_orders_to_do': driver_orders}}
 
 
 class HomeView(TemplateView):

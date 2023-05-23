@@ -1,0 +1,34 @@
+{% extends 'base-driver.html' %}
+
+
+{% block content %}
+
+<div class="my-order-header">
+  <h2><strong>Teczki przekazane przez innych użytkowników</strong></h2><br>
+  <h4>Możesz je zaakceptować, wtedy będą przypięte do Twojego konta, lub odrzucić i wrócą do nadawcy.</h4>
+</div>
+
+<div class='container' style="padding: 100px">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for driver in transfers %}
+        <div class="col">
+            <form action={% url 'kierowca:accept' driver.id %} method=POST>
+            {% csrf_token %}
+              <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+                <div class="card-header">Od: {{ driver.responsible_person.username }}</div>
+                <div class="card-body">
+                <h5 class="card-title">{{ driver.first_name }} {{ driver.last_name }}<br>{{ driver.pesel }}</h5>
+                <p class="card-text">Zamówienie nr: {{ driver.order.id }}<br>Teczka pobrana: {{ driver.transfer_date }}</p>
+                <button class="btn btn-danger card-link" name='reject' type="submit">Odrzuć</button>
+                <button class="btn btn-success card-link" style="float: right" name='accept' type="submit">Przyjmij</button>
+              </div>
+            </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+{% endblock content %}

@@ -1,0 +1,77 @@
+{% extends 'base-driver.html' %}
+
+{% block content %}
+<div class="my-order-header">
+    <h2><strong>Lista teczek pobranych przez użytkownika {{ user.get_username }}</strong></h2>
+</div><br>
+    <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
+    {% if orders.3 %}
+    Inni użytkownicy przekazują Ci teczki: 
+    <a href={% url 'kierowca:accept_driver' %}><button type="button" class="btn btn-primary position-relative" >
+        Odbierz
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          {{ orders.3.count }}
+          <span class="visually-hidden">unread messages</span>
+        </span>
+      </button></a>
+    {% endif %}
+    </div>
+
+    <div class="d-grid gap-4 p-2 d-md-flex justify-content-md-center">
+        <a href="/kierowca/user_list/" class="btn btn-primary">Wszystkie</a>
+        {% for s, n in orders.1 %}
+            {% if orders.3 == s %}
+                <a href="/kierowca/user_list/{{s}}" class="btn btn-primary active" aria-current="page">{{n}}</a>
+            {% else %}
+                <a href="/kierowca/user_list/{{s}}" class="btn btn-primary">{{n}}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class='container'>
+    <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>PESEL</th>
+                <th>Numer KK</th>
+                <th>Data urodzenia</th>
+                <th>Pobrał</th>
+                <th>Data Pobrania</th>
+                <th>Status</th>
+                <th>Przekaż</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in orders.0 %}  
+            <tr>
+                <th class="text-start" colspan='10'>Zamówienie: {{ order.id }}</th>
+            </tr>
+            
+            {% for driver in order.drivers.all %}
+            <tr>
+                {% if driver.responsible_person.username == user.get_username and driver.status in orders.2 %}
+                <td class="mx-auto">{{ driver.id }}</td>
+                <td class="mx-auto">{{ driver.first_name }}</td>
+                <td class="mx-auto">{{ driver.last_name }}</td>
+                <td class="mx-auto">{{ driver.pesel }}</td>
+                <td class="mx-auto">{{ driver.kk }}</td>
+                <td class="mx-auto">{{ driver.birth_date }}</td>
+                <td>{{ driver.responsible_person.username }}</td>
+                <td>{{ driver.transfer_date }}</td>
+                <td>{{ driver.status|upper }}</td>
+                <td>{% if driver.status == 'o' %}
+                    <a class='btn btn-primary'href="/kierowca/transfer/{{driver.id}}/">Przekaż</a>
+                    {% else %}---
+                    {% endif %}
+                </td>
+                {% endif %}{% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+{% endblock content %}

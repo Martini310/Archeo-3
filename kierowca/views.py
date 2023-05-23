@@ -1,13 +1,14 @@
 # pylint: disable=no-member
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
-from django.views.generic import CreateView, TemplateView, ListView, View, FormView
+from django.views.generic import CreateView, TemplateView, ListView, View, FormView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .forms import AddDriverForm, MyDriverOrderFormSet, ReturnDriverForm
+from .forms import AddDriverForm, MyDriverOrderFormSet, ReturnDriverForm, TransferDriverForm
 from .models import DriverOrder, Driver, User
 
 # Create your views here.
@@ -47,6 +48,22 @@ class AddDriver(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "zapisano!"
     success_url = reverse_lazy('kierowca:list')
     # TODO permission_required = 'kierowca.add_driver'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context["headline"] = "Dodaj nową teczkę kierowcy"
+        return context
+    
+    
+class DriverUpdateView(LoginRequiredMixin, UpdateView):
+    """ A View to update particular Driver - url:'update/<int:pk>/' """
+    model = Driver
+    fields = '__all__'
+    success_url = reverse_lazy('kierowca:list')
+    # permission_required = 'kierowca.change_driver'
+    permission_denied_message = 'Nie masz uprawnień do tej zawartości'
 
 
 class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
@@ -175,3 +192,72 @@ class ReturnDriverFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         self.request.session['returner'] = form.cleaned_data['returner'].pk
 
         return super().form_valid(form)
+
+
+class ListUserDriverView(LoginRequiredMixin, ListView):
+    """ List all drivers that currently logged user is responsible for. """
+    model = Driver
+    context_object_name = 'orders' # 'user_drivers'
+    template_name = 'kierowca/user_drivers.html'
+
+    def get(self, request, status='aore'):
+        orders = [order for order in DriverOrder.objects.all() if any(driver.responsible_person.username == request.user.get_username() and driver.status in status for driver in order.drivers.all())]
+        transfers = Driver.objects.filter(transfering_to=self.request.user)
+        context = {'orders': (orders, Driver.LOAN_STATUS, status, transfers)}
+        return render(request, 'kierowca/user_drivers.html', context)
+
+
+class TransferDriverView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    """ Update View to change the person responsible for driver file."""
+    model = Driver
+    form_class = TransferDriverForm
+    success_url = reverse_lazy('kierowca:user_list')
+    success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
+    # permission_required = 'kierowca.transfer_driver'
+    
+    def dispatch(self, request, *args, **kwargs):
+        handler = super(TransferDriverView, self).dispatch(request, *args, **kwargs)
+        # Only allow editing if current user is owner
+        if self.object.responsible_person != request.user:
+            return HttpResponseForbidden("Can't touch this.")
+        return handler
+    
+    # Sending user object to the form, to verify which fields to display/remove
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a headline
+        context["headline"] = "Przekaż teczke kierowcy innemu użytkownikowi"
+        return context
+    
+class AcceptTransferDriverView(LoginRequiredMixin, ListView):
+    template_name = 'kierowca/accept_drivers.html'
+    context_object_name = 'transfers'
+
+    def get_queryset(self):
+        queryset = Driver.objects.filter(transfering_to=self.request.user)
+        return queryset
+    
+    # def post(self, request, pk):
+    #     if 'accept' in request.POST:
+    #         Driver.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
+    #     elif 'reject' in request.POST:
+    #         Driver.objects.filter(id=pk).update(transfering_to=None)
+
+    #     return redirect(reverse_lazy('kierowca:user_list'))
+
+def update_transfer_status_view(request, pk):
+    """A View to handle accept/reject file transfer in AcceptTransferDriverView"""
+    if request.method == "POST":
+        if 'accept' in request.POST:
+            Driver.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
+        elif 'reject' in request.POST:
+            Driver.objects.filter(id=pk).update(transfering_to=None)
+
+        return redirect(reverse_lazy('kierowca:user_list'))
+    
