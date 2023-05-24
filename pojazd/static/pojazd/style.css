@@ -70,3 +70,9 @@ h2 {
   text-decoration: none;
   color: inherit;
 }
+
+.nav-title {
+  color: beige;
+  font-size: xx-large;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}

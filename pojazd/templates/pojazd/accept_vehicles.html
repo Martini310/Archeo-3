@@ -12,15 +12,15 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for vehicle in transfers %}
         <div class="col">
-            <form action={% url 'pojazd:accept' vehicle.id %} method=POST>
+            <form action={% url 'pojazd:accept_vehicle' %} method=POST>
             {% csrf_token %}
               <div class="card text-bg-light mb-3" style="max-width: 18rem;">
                 <div class="card-header">Od: {{ vehicle.responsible_person.username }}</div>
                 <div class="card-body">
                 <h5 class="card-title">{{ vehicle.tr }}</h5>
                 <p class="card-text">Zamówienie nr: {{ vehicle.order.id }}<br>Teczka pobrana: {{ vehicle.transfer_date }}</p>
-                <button class="btn btn-danger card-link" name='reject' type="submit">Odrzuć</button>
-                <button class="btn btn-success card-link" style="float: right" name='accept' type="submit">Przyjmij</button>
+                <button class="btn btn-danger card-link" name='reject' type="submit" value="{{ vehicle.id }}">Odrzuć</button>
+                <button class="btn btn-success card-link" style="float: right" name='accept' type="submit" value="{{ vehicle.id }}">Przyjmij</button>
               </div>
             </form>
             </div>

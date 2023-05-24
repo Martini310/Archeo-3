@@ -218,6 +218,7 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
     success_url = reverse_lazy('pojazd:user_list')
     success_message = 'Prawidłowo przekazano teczkę innemu użytkownikowi.'
     permission_required = 'pojazd.transfer_vehicle'
+    # permission_denied_message = 'Brak dostępu'
 
     def dispatch(self, request, *args, **kwargs):
         handler = super(TransferVehicleView, self).dispatch(request, *args, **kwargs)
@@ -231,7 +232,7 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
         kwargs = super(TransferVehicleView, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
         return kwargs
-
+    
 
 class AcceptTransferVehicleView(LoginRequiredMixin, ListView):
     template_name = 'pojazd/accept_vehicles.html'
@@ -241,14 +242,12 @@ class AcceptTransferVehicleView(LoginRequiredMixin, ListView):
         queryset = Vehicle.objects.filter(transfering_to=self.request.user)
         return queryset
 
-
-def update_transfer_status_view(request, pk):
-    """A View to handle accept/reject file transfer in AcceptTransferVehicleView"""
-    if request.method == "POST":
+    def post(self, request):
         if 'accept' in request.POST:
+            pk = request.POST['accept']
             Vehicle.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
         elif 'reject' in request.POST:
+            pk = request.POST['reject']
             Vehicle.objects.filter(id=pk).update(transfering_to=None)
 
-        return redirect(reverse_lazy('pojazd:user_list'))
-    
+        return redirect(reverse_lazy('pojazd:user_list', kwargs={'status': "aore"}))

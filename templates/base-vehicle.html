@@ -48,6 +48,9 @@
               </a>
               {% endif %}
             </div>
+            <div class="navbar-nav position-absolute top-50 start-50 translate-middle nav-title">
+              POJAZD
+            </div>
             <div class="navbar-nav ms-auto">
               {% if user.is_authenticated %}
               <button type="button" class="btn btn-outline-warning"><a class="nav-link" href="{% url 'logout' %}"><b>Wyloguj: {{ user.username }}</b></a></button>

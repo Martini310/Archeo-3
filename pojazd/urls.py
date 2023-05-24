@@ -16,6 +16,5 @@ urlpatterns = [
     path('user_list/<str:status>/', views.ListUserVehiclesView.as_view(), name='user_list'),
     path('transfer/<int:pk>/', views.TransferVehicleView.as_view(), name='transfer'),
     path('search/', views.search_view, name="search"),
-    path('accept_vehicles/', views.AcceptTransferVehicleView.as_view(), name='accept_vehicles'),
-    path('accept_vehicles/<int:pk>/', views.update_transfer_status_view, name='accept')
+    path('accept_vehicles/', views.AcceptTransferVehicleView.as_view(), name='accept_vehicle'),
 ]

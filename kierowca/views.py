@@ -243,21 +243,12 @@ class AcceptTransferDriverView(LoginRequiredMixin, ListView):
         queryset = Driver.objects.filter(transfering_to=self.request.user)
         return queryset
     
-    # def post(self, request, pk):
-    #     if 'accept' in request.POST:
-    #         Driver.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
-    #     elif 'reject' in request.POST:
-    #         Driver.objects.filter(id=pk).update(transfering_to=None)
-
-    #     return redirect(reverse_lazy('kierowca:user_list'))
-
-def update_transfer_status_view(request, pk):
-    """A View to handle accept/reject file transfer in AcceptTransferDriverView"""
-    if request.method == "POST":
+    def post(self, request):
         if 'accept' in request.POST:
+            pk = request.POST['accept']
             Driver.objects.filter(id=pk).update(responsible_person=request.user, transfering_to=None)
         elif 'reject' in request.POST:
+            pk = request.POST['reject']
             Driver.objects.filter(id=pk).update(transfering_to=None)
 
-        return redirect(reverse_lazy('kierowca:user_list'))
-    
+        return redirect(reverse_lazy('kierowca:user_list', kwargs={'status': "aore"}))

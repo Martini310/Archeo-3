@@ -14,6 +14,5 @@ urlpatterns = [
     path('user_list/<str:status>/', views.ListUserDriverView.as_view(), name='user_list'),
     path('transfer/<int:pk>/', views.TransferDriverView.as_view(), name='transfer'),
     path('accept_drivers/', views.AcceptTransferDriverView.as_view(), name='accept_driver'),
-    path('accept_drivers/<int:pk>/', views.update_transfer_status_view, name='accept'),
     path('update/<int:pk>/', views.DriverUpdateView.as_view(), name='update_driver'),
 ]
