@@ -183,10 +183,10 @@ class DriverOrdersToDoViewTest(TestCase):
         self.user = User.objects.create_user(username='testuser', password='testpass')
         self.user2 = User.objects.create_user(username='usertest', password='testpass')
 
-        self.order_a = DriverOrder.objects.create(order_date=timezone.now(), orderer=self.user)
-        self.order_o = DriverOrder.objects.create(order_date=timezone.now(), orderer=self.user)
-        self.order_r = DriverOrder.objects.create(order_date=timezone.now(), orderer=self.user)
-        self.order_e = DriverOrder.objects.create(order_date=timezone.now(), orderer=self.user2)
+        self.order_a = DriverOrder.objects.create(orderer=self.user)
+        self.order_o = DriverOrder.objects.create(orderer=self.user)
+        self.order_r = DriverOrder.objects.create(orderer=self.user)
+        self.order_e = DriverOrder.objects.create(orderer=self.user2)
 
         self.driver1_a = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='a', order=self.order_a)
         self.driver2_a = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="11111111116", birth_date="2000-08-05", kk="65465/23", responsible_person=self.user, status='a', order=self.order_a)
@@ -200,7 +200,7 @@ class DriverOrdersToDoViewTest(TestCase):
         self.driver7_e = Driver.objects.create(first_name="MARZENA", last_name="DUDA", pesel="66666666666", birth_date="2011-05-30", kk="", responsible_person=self.user2, status='e', order=self.order_e)
         self.driver8_e = Driver.objects.create(first_name="PAULINA", last_name="BŁASZAK", pesel="77777777772", birth_date="2005-11-30", kk="", responsible_person=self.user2, status='e', order=self.order_e)
 
-        self.url = reverse('kierowca:orders_to_do', args=['a'])
+        self.url = reverse('kierowca:driverorders_to_do', args=['a'])
 
     def test_view_requires_login(self):
         # Check if not logged user is redirected to login page
@@ -214,54 +214,149 @@ class DriverOrdersToDoViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
-    # TODO
-    # def test_view_displays_orders_with_specified_status(self):
-    #     self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
-    #     # Check if view displays only orders with vehicles with status 'a'(awaits)
-    #     self.client.login(username='testuser', password='testpass')
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'pojazd/orders_to_do.html')
-    #     self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
-    #     self.assertContains(response, '<td id="do-realizacji">2</td>')
-    #     self.assertContains(response, '<td id="ogółem">2</td>')
+    def test_view_displays_orders_with_specified_status(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_driverorder'))
+        # Check if view displays only orders with vehicles with status 'a'(awaits)
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/driverorders_to_do.html')
+        self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
+        self.assertContains(response, '<td id="do-realizacji">2</td>')
+        self.assertContains(response, '<td id="ogółem">2</td>')
 
-    #     self.assertContains(response, self.user.username)
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
+        self.assertContains(response, self.user.username)
+        self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
 
-    # def test_view_does_not_display_orders_with_different_status(self):
-    #     self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
-    #     # Check if view properly displays filtered orders (vehicles with status 'e')
-    #     self.client.login(username='testuser', password='testpass')
-    #     url = reverse('pojazd:orders_to_do', args=['e'])
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'pojazd/orders_to_do.html')
-    #     self.assertContains(response, f'Zamówienie nr {self.order_e.id}')
-    #     self.assertContains(response, '<td id="do-realizacji">0</td>')
-    #     self.assertContains(response, '<td id="ogółem">2</td>')
-    #     self.assertContains(response, self.user.username)
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_a.id}')
+    def test_view_does_not_display_orders_with_different_status(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_driverorder'))
+        # Check if view properly displays filtered orders (vehicles with status 'e')
+        self.client.login(username='testuser', password='testpass')
+        url = reverse('kierowca:driverorders_to_do', args=['e'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/driverorders_to_do.html')
+        self.assertContains(response, f'Zamówienie nr {self.order_e.id}')
+        self.assertContains(response, '<td id="do-realizacji">0</td>')
+        self.assertContains(response, '<td id="ogółem">2</td>')
+        self.assertContains(response, self.user.username)
+        self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_a.id}')
 
-    # def test_view_properly_count_files_with_different_status(self):
-    #     self.user.user_permissions.add(Permission.objects.get(codename='view_order'))
-    #     self.client.login(username='testuser', password='testpass')
+    def test_view_properly_count_files_with_different_status(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='view_driverorder'))
+        self.client.login(username='testuser', password='testpass')
+        # Move some drivers to another orders
+        Driver.objects.filter(pk=3).update(order=self.order_a)
+        Driver.objects.filter(pk=5).update(order=self.order_a)
+        Driver.objects.filter(pk=7).update(order=self.order_a)
 
-    #     Vehicle.objects.filter(pk=3).update(order=self.order_a)
-    #     Vehicle.objects.filter(pk=5).update(order=self.order_a)
-    #     Vehicle.objects.filter(pk=7).update(order=self.order_a)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
+        self.assertContains(response, '<td id="do-realizacji">2</td>')
+        self.assertContains(response, '<td id="ogółem">5</td>')
 
-    #     self.assertContains(response, f'Zamówienie nr {self.order_a.id}')
-    #     self.assertContains(response, '<td id="do-realizacji">2</td>')
-    #     self.assertContains(response, '<td id="ogółem">5</td>')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
+        self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
 
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_o.id}')
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_r.id}')
-    #     self.assertNotContains(response, f'Zamówienie nr {self.order_e.id}')
+
+class DriverOrderDetailsViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+
+        self.order = DriverOrder.objects.create(orderer=self.user)
+
+        self.driver1_a = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='a', order=self.order)
+        self.driver2_a = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="11111111116", birth_date="2000-08-05", kk="3456/23", responsible_person=self.user, status='o', order=self.order)
+
+        self.url = reverse('kierowca:order_details', args=['1'])
+
+    def test_view_requires_login(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=' + self.url)
+
+    def test_view_require_permission(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_view_display_all_files(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='change_driver'))
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200, 'aaa')
+        # Check if checkbox is displayed only to driver with status 'a' - awaits
+        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll1">')
+        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll2">')
+
+
+class ReturnDriverFormViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('kierowca:return')
+
+        self.order = DriverOrder.objects.create(order_date=timezone.now(), orderer=self.user)
+
+        self.driver1_a = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='o', order=self.order)
+        self.driver2_a = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="", birth_date="2000-08-05", kk="3456/23", responsible_person=self.user, status='o', order=self.order)
+
+    def test_user_has_no_permissions(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_has_permissions(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='return_driver'))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/return.html')
+
+    def test_return_driver_by_birth_date(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='return_driver'))
+        self.time = timezone.now()
+
+        # Create test data for the formset
+        form_data = {
+            'first_name': "ADAM",
+            'last_name': "KOWALSKI",
+            'birth_date': "2000-08-05",
+            'returner': self.user.pk,
+            'comments': 'Test comment 1',
+            'return_date': self.time,
+        }
+        self.client.post(reverse('kierowca:return'), data=form_data)
+        
+        driver = Driver.objects.get(birth_date="2000-08-05")
+        self.assertEqual(driver.status, 'r')
+        self.assertEqual(driver.returner, self.user)
+        self.assertEqual(driver.comments, 'Test comment 1')
+        self.assertEqual(driver.return_date.today, self.time.today)
+
+    def test_return_driver_by_pesel(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='return_driver'))
+        self.time = timezone.now()
+
+        # Create test data for the formset
+        form_data = {
+            'pesel':"12345678903",
+            'returner': self.user.pk,
+            'comments': 'Test comment 1',
+            'return_date': self.time,
+        }
+        self.client.post(reverse('kierowca:return'), data=form_data)
+        
+        driver = Driver.objects.get(pesel='12345678903')
+        self.assertEqual(driver.status, 'r')
+        self.assertEqual(driver.returner, self.user)
+        self.assertEqual(driver.comments, 'Test comment 1')
+        self.assertEqual(driver.return_date.today, self.time.today)
+
+    # TODO return drivers that cannot be returned (status: a, e, r)

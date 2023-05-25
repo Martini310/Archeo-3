@@ -30,7 +30,7 @@
         <td>{{forloop.counter}}</td>
         <td>Zamówienie nr {{order.0.id}}</td>
         <td id="do-realizacji">{{order.1}}</td>
-        <td id="ogółem">{{ order.0.vehicles.all.count }}</td>
+        <td id="ogółem">{{ order.0.drivers.all.count }}</td>
         <td>{{order.0.orderer}}</td>
     </tr>
     {% endfor %}

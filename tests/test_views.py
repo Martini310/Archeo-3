@@ -237,11 +237,7 @@ class OrderDetailsViewTest(TestCase):
     def test_view_require_permission(self):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403) # TODO incorect status
-        # self.assertContains(response, 'Nie masz dostępu do tej zawartości')
-        # self.assertRedirects(response, '/accounts/login/?next=' + self.url)
-        # response = self.client.get('/accounts/login/?next=' + self.url)
-        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
 
     def test_view_display_all_files(self):
         self.user.user_permissions.add(Permission.objects.get(codename='change_vehicle'))

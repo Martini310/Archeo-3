@@ -102,11 +102,11 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         return self.render_to_response({'my_driverorder_formset': formset})
 
 
-class DriverOrdersToDoView(LoginRequiredMixin, ListView):
+class DriverOrdersToDoView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     """ A View with listed all Driver orders divides into status categories. """
     model = DriverOrder
     template_name = 'driverorders_to_do.html'
-    # permission_required = 'kierowca.view_order'
+    permission_required = 'kierowca.view_driverorder'
 
     def get(self, request, status):
         orders = DriverOrder.objects.all()
@@ -116,7 +116,7 @@ class DriverOrdersToDoView(LoginRequiredMixin, ListView):
         return render(request, 'kierowca/driverorders_to_do.html', context={'orders': orders, 'status': status, 'abr': abr})
 
 
-class OrderDetails(LoginRequiredMixin, SuccessMessageMixin, View):
+class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, View):
     """
     A view to update a particular Order, save or reject Driver in the Order.
     URL: 'order_details/<int:pk>/'
@@ -124,7 +124,7 @@ class OrderDetails(LoginRequiredMixin, SuccessMessageMixin, View):
     model = Driver
     template_name = 'kierowca/order_details.html'
 
-    # permission_required = 'kierowca.change_driver'
+    permission_required = 'kierowca.change_driver'
     success_message = "Zmiany w zamówieniu zostały zapisane prawidłowo."
     # permission_denied_message = "Nie masz dostępu do tej zawartości."
     
@@ -152,11 +152,11 @@ class OrderDetails(LoginRequiredMixin, SuccessMessageMixin, View):
             return render(request, 'kierowca/order_details.html', context={'order': order, 'statuses': statuses})
 
 
-class ReturnDriverFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class ReturnDriverFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):
     """ A View to return a driver. """
     form_class = ReturnDriverForm
     template_name = 'kierowca/return.html'
-    # permission_required = 'kierowca.return_driver'
+    permission_required = 'kierowca.return_driver'
 
     success_url = '/kierowca/return/'
     success_message = "Teczka o numerze %(pesel)s została zwrócona prawidłowo"
