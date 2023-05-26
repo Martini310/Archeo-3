@@ -52,11 +52,16 @@
                 <td class="mx-auto">{{ vehicle.id }}</td>
                 <td class="mx-auto">{{ vehicle.tr }}</td>
                 <td>{{ vehicle.responsible_person.username }}</td>
-                <td>{{ vehicle.transfer_date }}</td>
-                <td>{{ vehicle.status|upper }}</td>
+                <td>{{ vehicle.transfer_date|default_if_none:'-' }}</td>
+                {% for s, n in orders.1 %}
+                    {% if s == vehicle.status %}
+                        <td>{{ n }}</td>
+                    {% endif %}
+                {% endfor %}
                 <td>{% if vehicle.status == 'o' %}
                     <a class='btn btn-primary'href="/pojazd/transfer/{{vehicle.id}}/">Przekaż</a>
-                    {% else %}---
+                    {% else %}
+                        ---
                     {% endif %}
                 </td>
                 {% endif %}{% endfor %}

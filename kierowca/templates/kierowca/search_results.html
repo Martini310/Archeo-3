@@ -10,7 +10,9 @@
                 <th>Pobrał</th>
                 <th>Data Pobrania</th>
                 <th>Status</th>
+                {% if perms.kierowca.change_driver %}
                 <th>Edytuj</th>
+                {% endif %}
                 <th>Szczegóły</th>
             </tr>
         </thead>
@@ -32,13 +34,21 @@
                 <td>{{ driver.id }}</td>
                 <td class="fw-bolder">{{ driver.first_name }}</td>
                 <td class="fw-bolder">{{ driver.last_name }}</td>
-                <td class="fw-bolder">{{ driver.pesel }}</td>
+                <td class="fw-bolder">
+                    {% if driver.pesel %}
+                        {{ driver.pesel }}
+                    {% else %}
+                        {{ driver.birth_date}}
+                    {% endif %}
+                </td>
                 <td>{{ driver.responsible_person.username }}</td>
-                <td>{{ driver.transfer_date }}</td>
+                <td>{{ driver.transfer_date|default_if_none:'-' }}</td>
                 <td>{{ driver.LOAN_STATUS|get_item:driver.status }}</td>
+                {% if perms.kierowca.change_driver %}
                 <td>
                     <a class='btn btn-primary' href="/kierowca/update/{{driver.id}}/">Edytuj</a>
                 </td>
+                {% endif %}                       
                 <td>
                     <!-- Button trigger modal -->
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ forloop.counter }}">

@@ -8,7 +8,9 @@
                 <th>Pobrał</th>
                 <th>Data Pobrania</th>
                 <th>Status</th>
+                {% if perms.pojazd.change_vehicle %}
                 <th>Edytuj</th>
+                {% endif %}
                 <th>Szczegóły</th>
             </tr>
         </thead>
@@ -32,9 +34,11 @@
                 <td>{{ vehicle.responsible_person.username }}</td>
                 <td>{{ vehicle.transfer_date }}</td>
                 <td>{{ vehicle.LOAN_STATUS|get_item:vehicle.status }}</td>
+                {% if perms.pojazd.change_vehicle %}
                 <td>
                     <a class='btn btn-primary' href="/pojazd/update/{{vehicle.id}}/">Edytuj</a>
                 </td>
+                {% endif %}
                 <td>
                     <!-- Button trigger modal -->
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ forloop.counter }}">

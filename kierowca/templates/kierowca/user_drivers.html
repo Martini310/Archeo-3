@@ -57,11 +57,15 @@
                 <td class="mx-auto">{{ driver.first_name }}</td>
                 <td class="mx-auto">{{ driver.last_name }}</td>
                 <td class="mx-auto">{{ driver.pesel }}</td>
-                <td class="mx-auto">{{ driver.kk }}</td>
+                <td class="mx-auto">{{ driver.kk|default_if_none:'-' }}</td>
                 <td class="mx-auto">{{ driver.birth_date }}</td>
                 <td>{{ driver.responsible_person.username }}</td>
-                <td>{{ driver.transfer_date }}</td>
-                <td>{{ driver.status|upper }}</td>
+                <td>{{ driver.transfer_date|default_if_none:'-' }}</td>
+                {% for s, n in orders.1 %}
+                    {% if s == driver.status %}
+                        <td>{{ n }}</td>
+                    {% endif %}
+                {% endfor %}
                 <td>{% if driver.status == 'o' %}
                     <a class='btn btn-primary'href="/kierowca/transfer/{{driver.id}}/">Przekaż</a>
                     {% else %}---
