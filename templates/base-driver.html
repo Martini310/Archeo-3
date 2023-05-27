@@ -10,9 +10,9 @@
     <script type="text/javascript" src="{% static 'pojazd/scripts.js' %}"></script>
     <script src="{% static 'pojazd/jquery-3.7.0.min.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'kierowca/style.css' %}">
-    {% block refresh %}
+    {% comment %} {% block refresh %}
       <meta http-equiv="refresh" content="60; URL={% url 'kierowca:list' %}">
-    {% endblock refresh %}
+    {% endblock refresh %} {% endcomment %}
     <title>Document</title>
 </head>
 <body>

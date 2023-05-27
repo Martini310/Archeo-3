@@ -32,7 +32,7 @@
                 <td>{{ vehicle.id }}</td>
                 <td class="fw-bolder">{{ vehicle.tr }}</td>
                 <td>{{ vehicle.responsible_person.username }}</td>
-                <td>{{ vehicle.transfer_date }}</td>
+                <td>{{ vehicle.transfer_date|default_if_none:'-' }}</td>
                 <td>{{ vehicle.LOAN_STATUS|get_item:vehicle.status }}</td>
                 {% if perms.pojazd.change_vehicle %}
                 <td>
