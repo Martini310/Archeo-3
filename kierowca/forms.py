@@ -112,6 +112,8 @@ class ReturnDriverForm(forms.ModelForm):
 
         self.fields['pesel'].required = False
 
+        self.fields['returner'].required = True
+
 
     class Meta:
         model = models.Driver

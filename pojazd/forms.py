@@ -13,6 +13,7 @@ class ReturnForm(forms.ModelForm):
             visible.field.widget.attrs['class'] = 'form-control'
             visible.field.widget.attrs['placeholder'] = visible.field.label
         self.fields['tr'].widget.attrs['oninput'] = 'handleInput(event)'
+        self.fields['returner'].required = True
 
 
     class Meta:
