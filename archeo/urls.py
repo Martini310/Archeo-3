@@ -18,9 +18,10 @@ from django.urls import path, include
 from pojazd.views import HomeView
 
 urlpatterns = [
+    path('', HomeView.as_view()),
     path('admin/', admin.site.urls),
     path('pojazd/', include('pojazd.urls')),
     path('kierowca/', include('kierowca.urls')),
-    path('', HomeView.as_view()),
+    path('spis/', include('spis_kierowca.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

@@ -1,0 +1,43 @@
+{% extends 'base-spis-kierowca.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="my-order-header">
+      <h2><strong>WSZYSTKIE TECZKI</strong></h2><br>
+    </div>
+    <form 
+        hx-get="{% url 'spis_kierowca:search' %}"
+        hx-target="#search-results"
+        hx-swap="outerHTML"
+        hx-trigger="submit, input delay:0.3s"
+        >
+
+        <div class="row g-3 input-group mb-2 mx-auto p-8" style="width: 700px;">
+            <div class="col-md form-floating mb-1">
+                <input type="text" class="form-control" id="floatingInput" name="search" placeholder="Szukaj..." value="{{ search }}">
+                <label class="fw-bolder" for="floatingInput">Szukaj...</label>
+            </div>
+
+            <div class="col-md">
+                <label class="fw-bolder" for="user">Pobrał:</label>
+                <select class="form-select" id="user" name="user">
+                    <option value="">---</option>
+                    {% for user in users %}
+                        <option value={{ user.id }}>{{ user.username }}</option>
+                    {% endfor %}     
+                </select> 
+            </div>
+        </div>
+    </form>
+    
+    {% include 'spis_kierowca/search_results.html' %}
+
+    <script type="text/javascript" src="{% static 'pojazd/htmx.min.js' %}"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        })
+    </script>
+    
+{% endblock content %}
+    

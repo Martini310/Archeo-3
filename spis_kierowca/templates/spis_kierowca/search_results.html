@@ -1,0 +1,106 @@
+<div id="search-results" class='container'>
+    <i>Znalezionych teczek: <b>{{ driver_list.count }}</b></i>
+    <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>PESEL</th>
+                <th>Nr K/K</th>
+                <th>Zamówienie</th>
+                {% if perms.kierowca.change_driver %}
+                <th>Edytuj</th>
+                {% endif %}
+                <th>Szczegóły</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for driver in driver_list %}
+                {% if loop.previtem is defined %}
+                    lalala
+                {% endif %}
+               {% if forloop.first %}
+                
+                <tr class="table-light">
+                    <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}</th>
+                </tr>
+               {% endif %}
+
+               {% if loop.nextitem is defined and driver.transfer_list.id == loop.nextitem.transfer_list.id %}
+
+               <tr class="table-light">
+                   <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}</th>
+               </tr>
+              {% endif %}
+
+                
+            <tr class="table-light">
+                
+                <td>{{ driver.id }}</td>
+                <td class="fw-bolder">{{ driver.first_name }}</td>
+                <td class="fw-bolder">{{ driver.last_name }}</td>
+                <td class="fw-bolder">
+                    {% if driver.pesel %}
+                    {{ driver.pesel }}
+                    {% else %}
+                    {{ driver.birth_date}}
+                    {% endif %}
+                </td>
+                <td class="fw-bolder">{{ driver.kk }}</td>
+                <td class="fw-bolder">{{ driver.transfer_list.id }}</td>
+
+                {% if perms.kierowca.change_driver %}
+                <td>
+                    <a class='btn btn-primary' href="/kierowca/update/{{driver.id}}/">Edytuj</a>
+                </td>
+                {% endif %}                       
+                <td>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ forloop.counter }}">
+                        Szczegóły
+                    </button>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ driver.tr }}</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {{ driver }}
+                                <table class="table">
+                                    <tbody>
+                                      {% for name, value in driver.get_fields %}
+                                      <tr>
+                                        <th scope="row">{{ name }}</th>
+                                        <td>
+                                        {% if value is None %}
+                                            ---
+                                        {% elif name == 'status' %}
+                                            {{ driver.LOAN_STATUS|get_item:value }}
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
+                                            </td>
+                                      </tr>
+                                      {% endfor %}
+                                    </tbody>
+                                </table>                          
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
