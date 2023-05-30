@@ -1,3 +1,4 @@
+{% load previous %}
 <div id="search-results" class='container'>
     <i>Znalezionych teczek: <b>{{ driver_list.count }}</b></i>
     <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
@@ -18,26 +19,16 @@
         <tbody>
             
             {% for driver in driver_list %}
-                {% if loop.previtem is defined %}
-                    lalala
-                {% endif %}
-               {% if forloop.first %}
-                
+
+               {% with previous_element=driver_list|previous:forloop.counter0 %}
+                {% if previous_element.transfer_list.id != driver.transfer_list.id %}
                 <tr class="table-light">
                     <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}</th>
                 </tr>
-               {% endif %}
+                {% endif %}
+              {% endwith %}
 
-               {% if loop.nextitem is defined and driver.transfer_list.id == loop.nextitem.transfer_list.id %}
-
-               <tr class="table-light">
-                   <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}</th>
-               </tr>
-              {% endif %}
-
-                
             <tr class="table-light">
-                
                 <td>{{ driver.id }}</td>
                 <td class="fw-bolder">{{ driver.first_name }}</td>
                 <td class="fw-bolder">{{ driver.last_name }}</td>
