@@ -1,5 +1,5 @@
 {% load previous %}
-<div id="search-results" class='container'>
+<div id="search-results" class='container print-section'>
     <i>Znalezionych teczek: <b>{{ driver_list.count }}</b></i>
     <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
         <thead>
@@ -23,12 +23,15 @@
                {% with previous_element=driver_list|previous:forloop.counter0 %}
                 {% if previous_element.transfer_list.id != driver.transfer_list.id %}
                 <tr class="table-light">
-                    <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}</th>
+                    <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}
+                    <a href="{% url 'spis_kierowca:list_details' driver.transfer_list.id %}"><button class="btn btn-primary right-button" style="margin-right: 50px;">Drukuj
+                    </button></a>
+                    </th>
                 </tr>
                 {% endif %}
               {% endwith %}
 
-            <tr class="table-light">
+            <tr class="table-light" name="print{{driver.transfer_list.id}}">
                 <td>{{ driver.id }}</td>
                 <td class="fw-bolder">{{ driver.first_name }}</td>
                 <td class="fw-bolder">{{ driver.last_name }}</td>
@@ -39,12 +42,12 @@
                     {{ driver.birth_date}}
                     {% endif %}
                 </td>
-                <td class="fw-bolder">{{ driver.kk }}</td>
+                <td class="fw-bolder">{{ driver.kk|default_if_none:'-' }}</td>
                 <td class="fw-bolder">{{ driver.transfer_list.id }}</td>
 
                 {% if perms.kierowca.change_driver %}
                 <td>
-                    <a class='btn btn-primary' href="/kierowca/update/{{driver.id}}/">Edytuj</a>
+                    <a class='btn btn-primary' href="/spis/update/{{driver.id}}/">Edytuj</a>
                 </td>
                 {% endif %}                       
                 <td>

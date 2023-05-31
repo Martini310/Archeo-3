@@ -1,14 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
+import locale
 
 # Create your models here.
+locale.setlocale(locale.LC_TIME, "pl_PL")
 
 class TransferListKierowca(models.Model):
     date = models.DateTimeField('Data spisu', auto_now_add=True)
     responsible_person = models.ForeignKey(User, related_name='spisy', on_delete=models.DO_NOTHING)
     
     def __str__(self) -> str:
-        return f"Zamówienie nr {self.pk} z dnia {self.date}."
+        return f"Zamówienie nr {self.pk} z dnia {self.date.strftime('%d %B %Y, %H:%M')}."
     
 
 class TransferDriver(models.Model):

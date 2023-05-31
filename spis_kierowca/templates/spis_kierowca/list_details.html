@@ -1,0 +1,54 @@
+{% extends 'base-spis-kierowca.html' %}
+
+{% block content %}
+<br>
+<div class="print-section">
+    <h2>{{object_list.0.transfer_list}}</h2><br>
+    <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>PESEL</th>
+                <th>Nr K/K</th>
+                <th>Uwagi</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for driver in object_list %}
+
+            <tr class="table-light" name="print{{driver.transfer_list.id}}">
+                <td>{{ driver.id }}</td>
+                <td class="fw-bolder">{{ driver.first_name }}</td>
+                <td class="fw-bolder">{{ driver.last_name }}</td>
+                <td class="fw-bolder">
+                    {% if driver.pesel %}
+                    {{ driver.pesel }}
+                    {% else %}
+                    {{ driver.birth_date}}
+                    {% endif %}
+                </td>
+                <td class="fw-bolder">{{ driver.kk|default_if_none:'-' }}</td>
+                <td class="fw-bolder">{{ driver.comments }}</td>
+                
+            </tr>
+            {% endfor %}
+            <td class="fw-bolder" colspan="6">Przekazujący: {{ object_list.0.transfer_list.responsible_person.username }}</td>
+        </tbody>
+    </table>
+
+    <button class="btn btn-primary right-button" style="margin-right: 50px;" onclick="window.print()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+            <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"></path>
+            <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"></path>
+        </svg>
+        Drukuj
+    </button>
+</div>
+
+
+
+
+{% endblock content %}

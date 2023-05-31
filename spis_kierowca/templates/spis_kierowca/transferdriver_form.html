@@ -1,0 +1,17 @@
+{% extends 'base-driver.html' %}
+
+
+{% block content %}
+    <div class="my-order-header">
+    <h2><strong>{{ headline }}</strong></h2><br>
+    </div>
+
+<div class="container min-vw-50">
+    <form action="" method="post">
+        {% csrf_token %}
+        <strong>{{form.as_p}}</strong>
+        <input type="submit" value="Zapisz">
+    </form>
+</div>
+{% endblock content %}
+    

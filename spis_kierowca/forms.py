@@ -2,6 +2,7 @@
 from django import forms
 from django.forms import formset_factory
 from django.core.exceptions import ValidationError
+from kierowca.models import Driver
 
 def pesel_validation(pesel):
     """ 
@@ -18,7 +19,8 @@ def pesel_validation(pesel):
         control_sum += int(number) * multipliers[index]
     if 10 - (control_sum % 10) != int(str(pesel)[-1]):
         raise ValidationError((f'PESEL: Błędna cyfra kontrolna {10 - (control_sum % 10)}'))
-
+    if Driver.objects.filter(pesel=pesel, status__in='ao').exists():
+        raise ValidationError("Ta teczka została zamówiona w module Kierowca")
 
 class TransferListKierowcaForm(forms.Form):
     """ Form for AddTransferListView"""

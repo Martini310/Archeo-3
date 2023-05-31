@@ -4,7 +4,7 @@
 <h2><strong>Zamówienie na teczki</strong></h2>
 <span>Wpisz numery pesel, imiona i nazwiska teczek, które chcesz zamówić oraz ewentualne uwagi, które mogą pomóc w ich odnalezieniu.</span>
 </div>
-<form class="my-order" id="form-container" method="POST">
+<form class="my-order" id="form-container" method="POST" style="width:60%">
     {% csrf_token %}
 
     {{ transfer_list_formset.management_form }}
@@ -19,7 +19,7 @@
     {% endfor %}
     <div class='container' id="buttons">
         <button class="btn btn-secondary" id="add-form" type="button">Dodaj pole</button>
-        <input class="btn btn-primary right-button" type="submit" value="Zamów">
+        <input class="btn btn-primary right-button" type="submit" value="Przekaż">
     </div>
 </form>
 

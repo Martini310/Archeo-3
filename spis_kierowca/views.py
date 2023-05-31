@@ -1,9 +1,11 @@
 # pylint: disable=no-member
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, UpdateView, ListView
 from django.contrib import messages
 from django.db.models import Q
 from .forms import TransferListKierowcaFormSet
@@ -34,7 +36,7 @@ def _search_drivers(request):
     drivers = TransferDriver.objects.all()
 
     if search:
-        drivers = drivers.filter(Q(pesel__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search))
+        drivers = drivers.filter(Q(pesel__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(kk__icontains=search))
     if user:
         drivers = drivers.filter(responsible_person=user)
     return drivers, search or ""
@@ -74,3 +76,20 @@ class AddTransferListKierowcaView(LoginRequiredMixin, SuccessMessageMixin, Templ
         
         messages.warning(request, 'Wprowadź przynajmniej jedną teczkę lub popraw błędy')
         return self.render_to_response({'transfer_list_formset': formset})
+    
+
+class TransferDriverUpdateView(LoginRequiredMixin, UpdateView):
+    """ A View to update particular Driver - url:'update/<int:pk>/' """
+    model = TransferDriver
+    fields = '__all__'
+    success_url = reverse_lazy('spis_kierowca:list')
+    # permission_required = 'kierowca.change_driver'
+    permission_denied_message = 'Nie masz uprawnień do tej zawartości'
+
+
+class TransferListView(ListView):
+    model = TransferListKierowca
+    template_name = 'spis_kierowca/list_details.html'
+
+    def get_queryset(self):
+        return TransferDriver.objects.filter(transfer_list=self.kwargs['pk'])
