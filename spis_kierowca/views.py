@@ -3,7 +3,7 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import TemplateView, UpdateView, ListView
 from django.contrib import messages
@@ -12,10 +12,6 @@ from .forms import TransferListKierowcaFormSet
 from .models import TransferDriver, TransferListKierowca, User
 
 # Create your views here.
-
-class TransferListKierowcaView(TemplateView):
-    pass
-
 
 def list_view(request):
     drivers, search = _search_drivers(request)
@@ -34,7 +30,6 @@ def _search_drivers(request):
     search = request.GET.get("search")
     user = request.GET.get("user")
     drivers = TransferDriver.objects.all()
-
     if search:
         drivers = drivers.filter(Q(pesel__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(kk__icontains=search))
     if user:
@@ -42,10 +37,12 @@ def _search_drivers(request):
     return drivers, search or ""
 
 
-class AddTransferListKierowcaView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
+class AddTransferListKierowcaView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, TemplateView):
     """ View to create a new DriverOrder. """
     template_name = 'spis_kierowca/add_list.html'
     success_message = "sukces"
+    permission_required = 'spis_kierowca.add_transferdriver'
+
 
     def get(self, *args, **kwargs):
         formset = TransferListKierowcaFormSet()
@@ -78,12 +75,12 @@ class AddTransferListKierowcaView(LoginRequiredMixin, SuccessMessageMixin, Templ
         return self.render_to_response({'transfer_list_formset': formset})
     
 
-class TransferDriverUpdateView(LoginRequiredMixin, UpdateView):
+class TransferDriverUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ A View to update particular Driver - url:'update/<int:pk>/' """
     model = TransferDriver
     fields = '__all__'
     success_url = reverse_lazy('spis_kierowca:list')
-    # permission_required = 'kierowca.change_driver'
+    permission_required = 'spis_kierowca.change_transferdriver'
     permission_denied_message = 'Nie masz uprawnień do tej zawartości'
 
 

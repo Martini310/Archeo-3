@@ -10,7 +10,7 @@ class TransferListKierowca(models.Model):
     responsible_person = models.ForeignKey(User, related_name='spisy', on_delete=models.DO_NOTHING)
     
     def __str__(self) -> str:
-        return f"Zamówienie nr {self.pk} z dnia {self.date.strftime('%d %B %Y, %H:%M')}."
+        return f"Protokół nr {self.pk} z dnia {self.date.strftime('%d %B %Y, g.%H:%M')}."
     
 
 class TransferDriver(models.Model):

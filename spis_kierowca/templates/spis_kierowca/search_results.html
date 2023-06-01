@@ -1,15 +1,15 @@
-{% load previous %}
+{% load next %}
+
 <div id="search-results" class='container print-section'>
     <i>Znalezionych teczek: <b>{{ driver_list.count }}</b></i>
     <table class="table table-xl table-dark table-striped table-hover mx-auto text-center">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>#</th>
                 <th>Imię</th>
                 <th>Nazwisko</th>
                 <th>PESEL</th>
                 <th>Nr K/K</th>
-                <th>Zamówienie</th>
                 {% if perms.kierowca.change_driver %}
                 <th>Edytuj</th>
                 {% endif %}
@@ -18,21 +18,28 @@
         </thead>
         <tbody>
             
-            {% for driver in driver_list %}
+            {% for driver in driver_list|dictsortreversed:"transfer_list.id" %}
 
-               {% with previous_element=driver_list|previous:forloop.counter0 %}
-                {% if previous_element.transfer_list.id != driver.transfer_list.id %}
-                <tr class="table-light">
-                    <th class="fw-bolder" colspan='8'>{{ driver.transfer_list }}
-                    <a href="{% url 'spis_kierowca:list_details' driver.transfer_list.id %}"><button class="btn btn-primary right-button" style="margin-right: 50px;">Drukuj
-                    </button></a>
+               {% with next_element=driver_list|next:forloop.revcounter0 %}
+                {% if next_element.transfer_list.id != driver.transfer_list.id %}
+                <tr class="table-warning">
+                    <th class="fw-bolder" colspan='8' style="color: dimgray"><strong>{{ driver.transfer_list }}</strong>
+                        <a href="{% url 'spis_kierowca:list_details' driver.transfer_list.id %}">
+                            <button class="btn btn-secondary  btn-sm right-button" style="margin-right: 60px; margin-top: 0px">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                                    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"></path>
+                                    <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"></path>
+                                </svg>
+                            </button>
+                        </a>
                     </th>
                 </tr>
                 {% endif %}
               {% endwith %}
 
+                
             <tr class="table-light" name="print{{driver.transfer_list.id}}">
-                <td>{{ driver.id }}</td>
+                <td>{{ forloop.revcounter }}</td>
                 <td class="fw-bolder">{{ driver.first_name }}</td>
                 <td class="fw-bolder">{{ driver.last_name }}</td>
                 <td class="fw-bolder">
@@ -43,16 +50,19 @@
                     {% endif %}
                 </td>
                 <td class="fw-bolder">{{ driver.kk|default_if_none:'-' }}</td>
-                <td class="fw-bolder">{{ driver.transfer_list.id }}</td>
 
                 {% if perms.kierowca.change_driver %}
                 <td>
-                    <a class='btn btn-primary' href="/spis/update/{{driver.id}}/">Edytuj</a>
+                    <a class='btn btn-primary btn-sm' href="/spis/update/{{driver.id}}/">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                          </svg>
+                    </a>
                 </td>
                 {% endif %}                       
                 <td>
                     <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{ forloop.counter }}">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal{{ forloop.counter }}">
                         Szczegóły
                     </button>
                     

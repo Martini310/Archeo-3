@@ -12,7 +12,10 @@
                 <th>Nazwisko</th>
                 <th>PESEL</th>
                 <th>Nr K/K</th>
-                <th>Uwagi</th>
+                <th>Uwagi</th>               
+                {% if perms.spis_kierowca.change_transferdriver %}
+                    <th>Edytuj</th>
+                {% endif %}    
             </tr>
         </thead>
         <tbody>
@@ -20,7 +23,7 @@
             {% for driver in object_list %}
 
             <tr class="table-light" name="print{{driver.transfer_list.id}}">
-                <td>{{ driver.id }}</td>
+                <td>{{ forloop.counter }}</td>
                 <td class="fw-bolder">{{ driver.first_name }}</td>
                 <td class="fw-bolder">{{ driver.last_name }}</td>
                 <td class="fw-bolder">
@@ -32,11 +35,23 @@
                 </td>
                 <td class="fw-bolder">{{ driver.kk|default_if_none:'-' }}</td>
                 <td class="fw-bolder">{{ driver.comments }}</td>
-                
+                {% if perms.spis_kierowca.change_transferdriver %}
+                <td>
+                    <a class='btn btn-primary btn-sm' href="/spis/update/{{driver.id}}/">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                          </svg>
+                    </a>
+                </td>
+            {% endif %}  
             </tr>
             {% endfor %}
-            <td class="fw-bolder" colspan="6">Przekazujący: {{ object_list.0.transfer_list.responsible_person.username }}</td>
         </tbody>
+        <tfoot>
+            <tr class="fw-bolder">
+                <td colspan = '100%'>Przekazujący: {{ object_list.0.transfer_list.responsible_person.username }}</td>
+            </tr>
+            </tfoot> 
     </table>
 
     <button class="btn btn-primary right-button" style="margin-right: 50px;" onclick="window.print()">
