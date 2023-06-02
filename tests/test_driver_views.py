@@ -360,3 +360,45 @@ class ReturnDriverFormViewTest(TestCase):
         self.assertEqual(driver.return_date.today, self.time.today)
 
     # TODO return drivers that cannot be returned (status: a, e, r)
+
+
+class DriverUpdateViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.order = DriverOrder.objects.create(orderer=self.user)
+        self.driver = Driver.objects.create(first_name='John', last_name='Doe', birth_date='1990-01-01', responsible_person=self.user)
+        self.url = reverse('kierowca:update_driver', kwargs={'pk': self.driver.pk})
+        self.client.login(username='testuser', password='testpassword')
+
+    def test_get_request(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='change_driver'))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/driver_form.html')
+        self.assertContains(response, 'John')  # Check if the rendered page contains the driver's first name
+
+    def test_post_request_valid_data(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='change_driver'))
+
+        data = {'first_name': 'Jane', 'last_name': 'Smith', 'birth_date': '1995-02-02', 'responsible_person': self.user.pk, 'order': self.order.id}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('kierowca:list'))
+        
+        # Verify that the driver object is updated with the new data
+        self.driver.refresh_from_db()
+        self.assertEqual(self.driver.first_name, 'Jane')
+        self.assertEqual(self.driver.last_name, 'Smith')
+
+    def test_post_request_invalid_data(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='change_driver'))
+        data = {'first_name': '', 'last_name': 'Smith', 'birth_date': '1995-02-02'}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, 'form', 'first_name', 'To pole jest wymagane.')  # Check if form validation error is displayed
+
+
+# Drukowanie błędów w formularzu
+# print(str(response.context['form'].errors))
