@@ -293,8 +293,8 @@ class DriverOrderDetailsViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200, 'aaa')
         # Check if checkbox is displayed only to driver with status 'a' - awaits
-        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll1">')
-        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll2">')
+        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll1" onclick="checkCheckbox("TestAll1")>')
+        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll2" onclick="checkCheckbox("TestAll2")>')
 
 
 class ReturnDriverFormViewTest(TestCase):
@@ -399,6 +399,117 @@ class DriverUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, 'form', 'first_name', 'To pole jest wymagane.')  # Check if form validation error is displayed
 
+
+
+class ListUserDriversViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.order = DriverOrder.objects.create(orderer=self.user)
+
+        self.user2 = User.objects.create_user(username='usertest', password='testpass')
+        self.order_2 = DriverOrder.objects.create(orderer=self.user2)
+
+        self.driver1_a = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='a', order=self.order)
+        self.driver2_a = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="11111111116", birth_date="2000-08-05", kk="65465/23", responsible_person=self.user2, status='a', order=self.order_2)
+
+        self.driver3_o = Driver.objects.create(first_name="ANDRZEJ", last_name="JAJNIAK", pesel="22222222222", birth_date="1999-12-31", kk="", responsible_person=self.user, status='o', order=self.order)
+        self.driver4_o = Driver.objects.create(first_name="ROBERT", last_name="MAŁYSZ", pesel="33333333338", birth_date="2000-01-01", kk="564/2000", responsible_person=self.user2, status='o', order=self.order_2)
+
+        self.driver5_r = Driver.objects.create(first_name="ANNA", last_name="NOWAK", pesel="44444444444", birth_date="1959-04-29", kk="", responsible_person=self.user, status='r', order=self.order)
+        self.driver6_r = Driver.objects.create(first_name="HANNA", last_name="KOWALSKA", pesel="5555555550", birth_date="1993-08-19", kk="56454/2012", responsible_person=self.user2, status='r', order=self.order_2)
+
+        self.driver7_e = Driver.objects.create(first_name="MARZENA", last_name="DUDA", pesel="66666666666", birth_date="2011-05-30", kk="", responsible_person=self.user, status='e', order=self.order)
+        self.driver8_e = Driver.objects.create(first_name="PAULINA", last_name="BŁASZAK", pesel="77777777772", birth_date="2005-11-30", kk="", responsible_person=self.user2, status='e', order=self.order_2)
+
+        self.url = reverse('kierowca:user_list', args=['aore'])
+
+    def test_login_required(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=/kierowca/user_list/aore/')
+
+    def test_user_has_only_self_drivers(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'kierowca/user_drivers.html')
+
+        self.assertContains(response, 'JAN')
+        self.assertContains(response, 'ANDRZEJ')
+        self.assertContains(response, 'ANNA')
+        self.assertContains(response, 'MARZENA')
+
+        self.assertNotContains(response, 'ADAM')
+        self.assertNotContains(response, 'ROBERT')
+        self.assertNotContains(response, 'HANNA')
+        self.assertNotContains(response, 'PAULINA')
+
+    def test_display_only_awaits_drivers(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('kierowca:user_list', args=['a'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'JAN')
+
+        self.assertNotContains(response, 'ANDRZEJ')
+        self.assertNotContains(response, 'ANNA')
+        self.assertNotContains(response, 'MARZENA')
+
+    def test_display_only_returned_drivers(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('kierowca:user_list', args=['r'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'ANNA')
+
+        self.assertNotContains(response, 'JAN')
+        self.assertNotContains(response, 'ANDRZEJ')
+        self.assertNotContains(response, 'MARZENA')
+
+    def test_display_only_onloan_drivers(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('kierowca:user_list', args=['o'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'ANDRZEJ')
+
+        self.assertNotContains(response, 'JAN')
+        self.assertNotContains(response, 'ANNA')
+        self.assertNotContains(response, 'MARZENA')
+
+    def test_display_only_rejected_drivers(self):
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('kierowca:user_list', args=['e'])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'MARZENA')
+
+        self.assertNotContains(response, 'JAN')
+        self.assertNotContains(response, 'ANDRZEJ')
+        self.assertNotContains(response, 'ANNA')
+
+    def test_display_drivers_transfered_to_user2_in_user(self):
+        # Test if driver transfered but not accepted is still in responsible user account
+        Driver.objects.filter(id=3).update(transfering_to=self.user2)
+
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ANDRZEJ')
+
+    def test_not_display_drivers_transfered_to_user2(self):
+        # Test if vehicle transfered but not accepted is not in 'transfering_to' user account
+        self.client.login(username='usertest', password='testpass')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'ANDRZEJ')
 
 # Drukowanie błędów w formularzu
 # print(str(response.context['form'].errors))
