@@ -64,4 +64,4 @@ class TransferFormTest(TestCase):
         form = TransferForm(data=form_data, user=self.user1, instance=self.vehicle)
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['transfering_to'], ['Select a valid choice. That choice is not one of the available choices.'])
+        self.assertEqual(form.errors['transfering_to'], ['Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów.'])

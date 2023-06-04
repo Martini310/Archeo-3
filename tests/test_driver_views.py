@@ -293,8 +293,8 @@ class DriverOrderDetailsViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200, 'aaa')
         # Check if checkbox is displayed only to driver with status 'a' - awaits
-        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll1" onclick="checkCheckbox("TestAll1")>')
-        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll2" onclick="checkCheckbox("TestAll2")>')
+        self.assertRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="1" name="boxes" id="TestAll1"onclick="checkCheckbox\(\'TestAll1\'\)')
+        self.assertNotRegex(response.content.decode(), r'<input class="form-check-input" type="checkbox" value="2" name="boxes" id="TestAll2"onclick="checkCheckbox\(\'TestAll2\'\)')
 
 
 class ReturnDriverFormViewTest(TestCase):

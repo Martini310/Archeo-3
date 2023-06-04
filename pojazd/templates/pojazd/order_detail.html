@@ -34,24 +34,11 @@
                         {% if vehicle.status == 'a' %}   
                           {% if event.approved %}
                             <div class="form-check">
-                              <input class="form-check-input" 
-                                      type="checkbox" 
-                                      checked="checked" 
-                                      value="{{vehicle.id}}" 
-                                      name="boxes" 
-                                      id="TestAll{{forloop.counter}}"
-                                      onclick="checkCheckbox('TestAll{{forloop.counter}}')"
-                              >
+                              <input class="form-check-input" type="checkbox" checked="checked" value="{{vehicle.id}}" name="boxes" id="TestAll{{forloop.counter}}"onclick="checkCheckbox('TestAll{{forloop.counter}}')">
                             </div>
                             {% else %}
                               <div class="form-check">
-                                <input class="form-check-input" 
-                                        type="checkbox" 
-                                        value="{{vehicle.id}}" 
-                                        name="boxes" 
-                                        id="TestAll{{forloop.counter}}"
-                                        onclick="checkCheckbox('TestAll{{forloop.counter}}')"
-                                >
+                                <input class="form-check-input" type="checkbox" value="{{vehicle.id}}" name="boxes" id="TestAll{{forloop.counter}}"onclick="checkCheckbox('TestAll{{forloop.counter}}')">
                               </div>
                           {% endif %}
                         {% endif %}
