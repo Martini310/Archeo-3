@@ -1,6 +1,6 @@
 # pylint: disable=no-member
 from django.test import TestCase
-from kierowca.forms import MyDriverOrderForm
+from kierowca.forms import MyDriverOrderForm, TransferDriverForm
 from kierowca.models import Driver, User
 from django.utils import timezone
 # Create your tests here.
@@ -133,3 +133,43 @@ class MyDriverOrderFormTest(TestCase):
                                        'kk': self.kk,})
         
         self.assertFalse(form.is_valid())
+
+
+class TransferFormTest(TestCase):
+    
+    def setUp(self):
+        self.now = timezone.now()
+        self.user1 = User.objects.create_user(username='user1', password='password')
+        self.user2 = User.objects.create_user(username='user2', password='password')
+        self.driver = Driver.objects.create(first_name='Jan', last_name='Kowalski', pesel='12345678903', birth_date='2000-01-01', kk='1234/22', transfer_date=self.now, responsible_person=self.user1)
+
+    def test_valid_form(self):
+        form_data = {
+            'first_name': 'Jan',
+            'last_name': 'Kowalski',
+            'pesel': '12345678903',
+            'birth_date': '2000-01-01',
+            'kk': '1234/22',
+            'transfer_date': self.now,
+            'transfering_to': self.user2.pk,
+            'comments': 'Some comments'
+        }
+        form = TransferDriverForm(data=form_data, user=self.user1, instance=self.driver)
+        # print(form.errors)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        form_data = {
+            'first_name': 'Jan',
+            'last_name': 'Kowalski',
+            'pesel': '12345678903',
+            'birth_date': '2000-01-01',
+            'kk': '1234/22',
+            'transfer_date': self.now,
+            'transfering_to': self.user1.pk,  # Should exclude current user
+            'comments': 'Some comments'
+        }
+        form = TransferDriverForm(data=form_data, user=self.user1, instance=self.driver)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertEqual(form.errors['transfering_to'], ['Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów.'])
