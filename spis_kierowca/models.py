@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-import locale
+# import locale
 
 # Create your models here.
-locale.setlocale(locale.LC_TIME, "pl_PL")
+# locale.setlocale(locale.LC_TIME, "pl_PL")
 
 class TransferListKierowca(models.Model):
     date = models.DateTimeField('Data spisu', auto_now_add=True)
