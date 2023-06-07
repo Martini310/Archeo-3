@@ -1,8 +1,9 @@
 # pylint: disable=no-member
 from django.test import TestCase
-from kierowca.forms import MyDriverOrderForm, TransferDriverForm
-from kierowca.models import Driver, User
+from kierowca.forms import MyDriverOrderForm, TransferDriverForm, ReturnDriverForm, pesel_validation
+from kierowca.models import Driver, User, DriverOrder
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 # Create your tests here.
 
 class MyDriverOrderFormTest(TestCase):
@@ -173,3 +174,81 @@ class TransferFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['transfering_to'], ['Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów.'])
+
+
+class ReturnDriverFormTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.order = DriverOrder.objects.create(orderer=self.user)
+        self.driver1 = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678901", birth_date="1900-01-04", kk="", responsible_person=self.user, status='o', order=self.order)
+    def test_valid_form_data(self):
+        form_data = {
+            'first_name': 'JAN',
+            'last_name': 'NOWAK',
+            'pesel': '12345678901',
+            'returner': self.user.pk,
+            'comments': 'Returned successfully',
+        }
+        form = ReturnDriverForm(data=form_data)
+        # print(form.errors)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form_data(self):
+        # Missing required fields (returner)
+        form_data = {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'pesel': '12345678901',
+            'comments': 'Returned successfully',
+        }
+        form = ReturnDriverForm(data=form_data)
+        # print(form.errors)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertIn('returner', form.errors)
+
+        # Invalid pesel
+        form_data['returner'] = self.user.pk
+        form_data['pesel'] = '1234'  # Invalid pesel length
+        form = ReturnDriverForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertIn('pesel', form.errors)
+
+    def test_clean_pesel_with_valid_pesel(self):
+        driver = Driver.objects.create(first_name='John', last_name='Doe', birth_date='2000-03-03', pesel='12345678901', status='o', responsible_person=self.user, order=self.order)
+        form_data = {
+            'pesel': '12345678901',
+            'returner': self.user.pk,
+        }
+        form = ReturnDriverForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['pesel'], driver.pesel)
+
+    def test_clean_pesel_with_invalid_pesel(self):
+        form_data = {
+            'pesel': '12345678905',
+            'returner': self.user.pk,
+        }
+        form = ReturnDriverForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertIn('pesel', form.errors)
+
+
+# class PeselValidationTest(TestCase):
+#     def test_pesel_validation(self):
+#         self.user = User.objects.create_user(username='testuser', password='testpass')
+#         self.order = DriverOrder.objects.create(orderer=self.user)
+
+#         self.driver1 = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='a', order=self.order)
+#         self.driver2 = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="11111111116", birth_date="2000-08-05", kk="65465/23", responsible_person=self.user, status='o', order=self.order)
+#         self.driver3 = Driver.objects.create(first_name="ANDRZEJ", last_name="JANIAK", pesel="22222222222", birth_date="1999-12-31", kk="", responsible_person=self.user, status='r', order=self.order)
+#         self.driver4 = Driver.objects.create(first_name="ROBERT", last_name="MAŁYSZ", pesel="33333333338", birth_date="2000-01-01", kk="564/2000", responsible_person=self.user, status='e', order=self.order)
+
+#         self.assertRaises(ValidationError, pesel_validation, '12345678903') # Driver is 'awaits'
+#         self.assertRaises(ValidationError, pesel_validation, '1234567890') # pesel to short
+#         self.assertRaises(ValidationError, pesel_validation, '123456789033') # pesel to long
+#         self.assertRaises(ValidationError, pesel_validation, '12345678901') # wrong checksum
+#         self.assertRaises(ValidationError, pesel_validation, '11111111116') # Driver is 'on loan'
+
