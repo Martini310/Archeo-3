@@ -236,19 +236,19 @@ class ReturnDriverFormTest(TestCase):
         self.assertIn('pesel', form.errors)
 
 
-# class PeselValidationTest(TestCase):
-#     def test_pesel_validation(self):
-#         self.user = User.objects.create_user(username='testuser', password='testpass')
-#         self.order = DriverOrder.objects.create(orderer=self.user)
+class PeselValidationTest(TestCase):
+    def test_pesel_validation(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.order = DriverOrder.objects.create(orderer=self.user)
 
-#         self.driver1 = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='a', order=self.order)
-#         self.driver2 = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="11111111116", birth_date="2000-08-05", kk="65465/23", responsible_person=self.user, status='o', order=self.order)
-#         self.driver3 = Driver.objects.create(first_name="ANDRZEJ", last_name="JANIAK", pesel="22222222222", birth_date="1999-12-31", kk="", responsible_person=self.user, status='r', order=self.order)
-#         self.driver4 = Driver.objects.create(first_name="ROBERT", last_name="MAŁYSZ", pesel="33333333338", birth_date="2000-01-01", kk="564/2000", responsible_person=self.user, status='e', order=self.order)
+        self.driver1 = Driver.objects.create(first_name="JAN", last_name="NOWAK", pesel="12345678903", birth_date="1900-01-04", kk="", responsible_person=self.user, status='a', order=self.order)
+        self.driver2 = Driver.objects.create(first_name="ADAM", last_name="KOWALSKI", pesel="11111111116", birth_date="2000-08-05", kk="65465/23", responsible_person=self.user, status='o', order=self.order)
+        self.driver3 = Driver.objects.create(first_name="ANDRZEJ", last_name="JANIAK", pesel="22222222222", birth_date="1999-12-31", kk="", responsible_person=self.user, status='r', order=self.order)
+        self.driver4 = Driver.objects.create(first_name="ROBERT", last_name="MAŁYSZ", pesel="33333333338", birth_date="2000-01-01", kk="564/2000", responsible_person=self.user, status='e', order=self.order)
 
-#         self.assertRaises(ValidationError, pesel_validation, '12345678903') # Driver is 'awaits'
-#         self.assertRaises(ValidationError, pesel_validation, '1234567890') # pesel to short
-#         self.assertRaises(ValidationError, pesel_validation, '123456789033') # pesel to long
-#         self.assertRaises(ValidationError, pesel_validation, '12345678901') # wrong checksum
-#         self.assertRaises(ValidationError, pesel_validation, '11111111116') # Driver is 'on loan'
+        self.assertRaises(ValidationError, pesel_validation, '12345678903') # Driver is 'awaits'
+        self.assertRaises(ValidationError, pesel_validation, '1234567890') # pesel to short
+        self.assertRaises(ValidationError, pesel_validation, '123456789033') # pesel to long
+        self.assertRaises(ValidationError, pesel_validation, '12345678901') # wrong checksum
+        self.assertRaises(ValidationError, pesel_validation, '11111111116') # Driver is 'on loan'
 
