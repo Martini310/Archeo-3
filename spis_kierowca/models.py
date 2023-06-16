@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-# import locale
+import locale
 
 # Create your models here.
-# locale.setlocale(locale.LC_TIME, "pl_PL")
+locale.setlocale(locale.LC_TIME, "pl_PL")
 
 class TransferListKierowca(models.Model):
     date = models.DateTimeField('Data spisu', auto_now_add=True)
@@ -19,7 +19,7 @@ class TransferDriver(models.Model):
     pesel = models.CharField('PESEL', max_length=11, blank=True, null=True)
     kk = models.CharField('Numer K/K',max_length=15 , blank=True, null=True)
     birth_date = models.DateField('Data urodzenia')
-    transfer_list = models.ForeignKey(TransferListKierowca, related_name='transfer_list', on_delete=models.DO_NOTHING)
+    transfer_list = models.ForeignKey(TransferListKierowca, related_name='transfer_list', on_delete=models.DO_NOTHING, blank=True, null=True)
     comments = models.CharField('Uwagi', max_length=100, null=True, blank=True)
 
     def __str__(self) -> str:

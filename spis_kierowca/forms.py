@@ -21,6 +21,12 @@ def pesel_validation(pesel):
         raise ValidationError((f'PESEL: Błędna cyfra kontrolna {10 - (control_sum % 10)}'))
     if Driver.objects.filter(pesel=pesel, status__in='ao').exists():
         raise ValidationError("Ta teczka została zamówiona w module Kierowca")
+    
+def birth_date_validation(birth_date, first_name, last_name):
+    driver = Driver.objects.filter(birth_date=birth_date, first_name=first_name, last_name=last_name, status__in='ao').exists()
+    if driver:
+        raise ValidationError("Ta teczka została zamówiona w module Kierowca")
+
 
 class TransferListKierowcaForm(forms.Form):
     """ Form for AddTransferListView"""
@@ -68,5 +74,13 @@ class TransferListKierowcaForm(forms.Form):
             pesel_validation(pesel)
         return pesel
 
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data['birth_date']
+        first_name = self.cleaned_data['first_name']
+        last_name = self.cleaned_data['last_name']
+        if birth_date:
+            birth_date_validation(birth_date, first_name, last_name)
+        return birth_date
 
-TransferListKierowcaFormSet = formset_factory(TransferListKierowcaForm, extra=10)
+
+TransferListKierowcaFormSet = formset_factory(TransferListKierowcaForm, extra=1)

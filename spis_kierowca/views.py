@@ -58,16 +58,17 @@ class AddTransferListKierowcaView(LoginRequiredMixin, PermissionRequiredMixin, S
             if any(len(row) > 0 for row in formset.cleaned_data):
                 user = request.user
                 transfer_list = TransferListKierowca.objects.create(responsible_person=user)
-                # print(formset.cleaned_data)
-                
-                TransferDriver.objects.bulk_create([TransferDriver(first_name=row.get('first_name'),
-                                                    last_name=row['last_name'],
-                                                    pesel=row['pesel'],
-                                                    birth_date=row['birth_date'],
-                                                    kk=row['kk'],
-                                                    transfer_list=transfer_list,
-                                                    comments=row['comments']) 
-                                                     for row in formset.cleaned_data if (row.get('last_name') is not None and row.get('first_name') is not None)])
+                print(transfer_list)
+                print(formset.cleaned_data)
+                TransferDriver.objects.bulk_create([TransferDriver(first_name=row['first_name'],
+                                                                   last_name=row['last_name'],
+                                                                   pesel=row['pesel'],
+                                                                   birth_date=row['birth_date'],
+                                                                   kk=row['kk'],
+                                                                   transfer_list=transfer_list,
+                                                                   comments=row['comments']) 
+                                                                   for row in formset.cleaned_data if (row.get('last_name') is not None and row.get('first_name') is not None)])
+        
                 messages.success(request, 'Twój spis teczek przekazywanych do archiwum został zapisany poprawnie!')
                 return redirect(reverse_lazy("spis_kierowca:list"))
         
