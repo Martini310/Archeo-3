@@ -75,6 +75,7 @@ class TransferListKierowcaForm(forms.Form):
         return pesel
 
     def clean_birth_date(self):
+        """ Check if driver without pesel and with birth date only is already taken or ordered and show error if is. """
         birth_date = self.cleaned_data['birth_date']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
@@ -83,4 +84,4 @@ class TransferListKierowcaForm(forms.Form):
         return birth_date
 
 
-TransferListKierowcaFormSet = formset_factory(TransferListKierowcaForm, extra=1)
+TransferListKierowcaFormSet = formset_factory(TransferListKierowcaForm, extra=10)

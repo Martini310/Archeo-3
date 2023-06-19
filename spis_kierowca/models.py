@@ -23,5 +23,8 @@ class TransferDriver(models.Model):
     comments = models.CharField('Uwagi', max_length=100, null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}, pesel {self.pesel}. {self.comments}"
+        return f"ID: {self.pk}. {self.first_name} {self.last_name}, pesel {self.pesel or ''}. {self.comments or ''}"
+    
+    def get_fields(self):
+        return [(field.verbose_name, getattr(self,field.name)) for field in TransferDriver._meta.fields]
     

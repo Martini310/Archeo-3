@@ -1,4 +1,5 @@
 {% load next %}
+{% load previous %}
 
 <div id="search-results" class='container print-section'>
     <i>Znalezionych teczek: <b>{{ driver_list.count }}</b></i>
@@ -18,10 +19,10 @@
         </thead>
         <tbody>
             
-            {% for driver in driver_list|dictsortreversed:"transfer_list.id" %}
+            {% for driver in driver_list %}
 
-               {% with next_element=driver_list|next:forloop.revcounter0 %}
-                {% if next_element.transfer_list.id != driver.transfer_list.id %}
+               {% with prev_element=driver_list|previous:forloop.counter0 %}
+                {% if prev_element.transfer_list.id != driver.transfer_list.id %}
                 <tr class="table-warning">
                     <th class="fw-bolder" colspan='8' style="color: dimgray"><strong>{{ driver.transfer_list }}</strong>
                         <a href="{% url 'spis_kierowca:list_details' driver.transfer_list.id %}">
@@ -49,7 +50,7 @@
                     {{ driver.birth_date}}
                     {% endif %}
                 </td>
-                <td class="fw-bolder">{{ driver.kk|default_if_none:'-' }}</td>
+                <td class="fw-bolder">{{ driver.kk|default_if_none:'---' }}</td>
 
                 {% if perms.kierowca.change_driver %}
                 <td>
@@ -71,25 +72,18 @@
                         <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ driver.tr }}</h1>
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ driver }}</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                {{ driver }}
                                 <table class="table">
                                     <tbody>
                                       {% for name, value in driver.get_fields %}
                                       <tr>
                                         <th scope="row">{{ name }}</th>
                                         <td>
-                                        {% if value is None %}
-                                            ---
-                                        {% elif name == 'status' %}
-                                            {{ driver.LOAN_STATUS|get_item:value }}
-                                        {% else %}
-                                            {{ value }}
-                                        {% endif %}
-                                            </td>
+                                            {{ value|default_if_none:'---' }}
+                                        </td>
                                       </tr>
                                       {% endfor %}
                                     </tbody>

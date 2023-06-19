@@ -33,8 +33,8 @@ def _search_drivers(request):
     if search:
         drivers = drivers.filter(Q(pesel__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(kk__icontains=search))
     if user:
-        drivers = drivers.filter(responsible_person=user)
-    return drivers, search or ""
+        drivers = drivers.filter(transfer_list__responsible_person=user)
+    return drivers.order_by('-transfer_list__id', 'id'), search or ""
 
 
 class AddTransferListKierowcaView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, TemplateView):
