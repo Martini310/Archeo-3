@@ -82,6 +82,8 @@ class MyDriverOrderForm(forms.Form):
                                required=False,
                                widget=forms.TextInput(attrs={'placeholder': 'Uwagi',
                                                              'class': 'form-control'}))
+    
+    zadanie_akt = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
 
     def clean_pesel(self):
         """ Check if driver is already taken or ordered and show error if is. """

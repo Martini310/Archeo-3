@@ -28,11 +28,13 @@ class Driver(models.Model):
         ('a', 'Oczekuje'), # a - Awaits
         ('o', 'Wypożyczona'), # o - On loan
         ('r', 'Zwrócona'), # r - Returned
-        ('e', 'Odrzucona') # e - Rejected/error
+        ('e', 'Odrzucona'), # e - Rejected/error
+        ('z', 'Żądanie akt')
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
     order = models.ForeignKey(DriverOrder, related_name="drivers", on_delete=models.SET_NULL, null=True, verbose_name='Zamówienie')
     returner = models.ForeignKey(User, related_name='drivers_returner', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Zwracający')
+    zadanie_akt = models.BooleanField(verbose_name='Żądanie akt')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}. Pesel: {self.pesel}'

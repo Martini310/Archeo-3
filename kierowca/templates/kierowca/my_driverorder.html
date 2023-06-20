@@ -12,7 +12,16 @@
         <div class="input-group mb-2" id="tr-div">
         <span class="input-group-text" id="id_form-{{forloop.counter|add:'-1'}}-lp">{{forloop.counter}}</span>
         {% for field in form %}
+            
+            {% if field.field.widget.input_type == 'checkbox' %}
+            <div class="checkbox-container">
+                {{ field }}
+                <label for="{{ field.id }}">Zadanie Akt</label>
+            </div>
+            {% else %}
             {{field}}
+            {% endif %}
+                
         {% endfor %}
         </div>
         {{ form.errors }}

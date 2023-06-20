@@ -77,3 +77,13 @@ color: inherit;
   font-size: xx-large;
   font-family: Georgia, 'Times New Roman', Times, serif;
 }
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.checkbox-container label {
+  margin-left: 10px;
+}
