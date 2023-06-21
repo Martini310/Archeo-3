@@ -93,7 +93,8 @@ class MyDriverOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
                                                     birth_date=row['birth_date'],
                                                     responsible_person=user,
                                                     order=order,
-                                                    comments=row['comments']) 
+                                                    comments=row['comments'],
+                                                    zadanie_akt=row['zadanie_akt'])
                                                      for row in formset.cleaned_data if row.get('last_name') is not None])
                 messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
                 return redirect(reverse_lazy("kierowca:list"))
@@ -141,10 +142,18 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
         if id_list:
             if 'save' in request.POST:
                 for input_id in id_list:
-                    Driver.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
+                    driver = Driver.objects.get(pk=int(input_id))
+                    driver.transfer_date=timezone.now()
+                    if driver.zadanie_akt:
+                        driver.status='z'
+                    else:
+                        driver.status='o'
+                    driver.save()
             elif 'reject' in request.POST:
                 for input_id in id_list:
-                    Driver.objects.filter(pk=int(input_id)).update(status='e')
+                    driver = Driver.objects.get(pk=int(input_id))
+                    driver.status='e'
+                    driver.save()
 
             return redirect('kierowca:list')
         else:

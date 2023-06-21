@@ -37,7 +37,9 @@ class AddDriverForm(forms.ModelForm):
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
             visible.field.widget.attrs['placeholder'] = visible.field.label
-        # self.fields['tr'].widget.attrs['oninput'] = 'handleInput(event)'
+        self.fields['first_name'].widget.attrs['oninput'] = 'handleInput(event)'
+        self.fields['last_name'].widget.attrs['oninput'] = 'handleInput(event)'
+        self.fields['zadanie_akt'].widget = forms.CheckboxInput()
 
     class Meta:
         model = models.Driver
@@ -83,7 +85,11 @@ class MyDriverOrderForm(forms.Form):
                                widget=forms.TextInput(attrs={'placeholder': 'Uwagi',
                                                              'class': 'form-control'}))
     
-    zadanie_akt = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+    zadanie_akt = forms.BooleanField(initial=False,
+                                     required=False,
+                                     widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox',
+                                                                       'checked': False,
+                                                                       }))
 
     def clean_pesel(self):
         """ Check if driver is already taken or ordered and show error if is. """

@@ -20,7 +20,7 @@
             
             {% for driver in driver_list %}
             
-            {% if driver.status == 'r' %}
+            {% if driver.status in 'rz' %}
             <tr class="table-success">
             {% elif driver.status == 'o' %}
             <tr class="table-warning">

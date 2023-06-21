@@ -14,10 +14,11 @@
         {% for field in form %}
             
             {% if field.field.widget.input_type == 'checkbox' %}
+            <div class="form-control">
             <div class="checkbox-container">
                 {{ field }}
-                <label for="{{ field.id }}">Zadanie Akt</label>
-            </div>
+                <label for="{{ field.id }}" class="checkbox-container">Żądanie akt</label>
+            </div></div>
             {% else %}
             {{field}}
             {% endif %}
