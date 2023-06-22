@@ -23,21 +23,24 @@ class Vehicle(models.Model):
         ('a', 'Oczekuje'), # a - Awaits
         ('o', 'Wypożyczona'), # o - On loan
         ('r', 'Zwrócona'), # r - Returned
-        ('e', 'Odrzucona') # e - Rejected/error
+        ('e', 'Odrzucona'), # e - Rejected/error
+        ('b', 'Bezzwrotnie')
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
-    order = models.ForeignKey(Order, related_name="vehicles", on_delete=models.SET_NULL, null=True, verbose_name='Zamówienie')
+    order = models.ForeignKey(Order, related_name="vehicles", on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Zamówienie')
     returner = models.ForeignKey(User, related_name='vehicles_returner', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Zwracający')
 
     def __str__(self) -> str:
         if self.status == 'o':
             return f"Teczka {self.tr} została pobrana przez: {self.responsible_person} w dniu {self.transfer_date.strftime('%d-%m-%Y %H:%M.%S')}. Nr zamówienia: {self.order.id}."
-        elif self.status == 'a':
+        if self.status == 'a':
             return f"Teczka {self.tr} została zamówiona przez: {self.responsible_person} w dniu {self.order.order_date.strftime('%d-%m-%Y %H:%M.%S')}. Nr zamówienia: {self.order.id}."
-        elif self.status == 'r':
+        if self.status == 'r':
             return f"Teczka {self.tr} została zwrócona przez: {self.returner} w dniu {self.return_date.strftime('%d-%m-%Y %H:%M.%S')}."
-        elif self.status == 'e':
+        if self.status == 'e':
             return f"Teczka {self.tr} zamówiona przez: {self.responsible_person} została odrzucona. Nr zamówienia: {self.order.id}."
+        if self.status == 'b':
+            return f"Teczka {self.tr} zamówiona przez: {self.responsible_person} została pobrana bezzwrotnie."
     
     def get_fields(self):
         """Get all name and values from model fields"""

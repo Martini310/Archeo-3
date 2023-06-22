@@ -18,7 +18,7 @@
             
             {% for vehicle in vehicle_list %}
             
-            {% if vehicle.status == 'r' %}
+            {% if vehicle.status in 'rb' %}
             <tr class="table-success">
             {% elif vehicle.status == 'o' %}
             <tr class="table-warning">

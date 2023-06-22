@@ -54,8 +54,10 @@ h2 {
 }
 
 .right-button {
-  float: right;
+  float: left;
   margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 17%;
 }
 
 .my-order-header {
@@ -75,4 +77,10 @@ h2 {
   color: beige;
   font-size: xx-large;
   font-family:Georgia, 'Times New Roman', Times, serif;
+}
+
+.center {
+  width: 80%;
+  margin: auto;
+  text-align: center;
 }

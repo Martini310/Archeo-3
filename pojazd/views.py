@@ -150,11 +150,15 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
         # List of ids from vehicles with checked checkboxes
         order = Order.objects.get(pk=pk)
         statuses = dict(Vehicle.LOAN_STATUS)
+        print(request.POST)
         id_list = request.POST.getlist('boxes')
         if id_list:
             if 'save' in request.POST:
                 for input_id in id_list:
-                    Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
+                    if input_id in request.POST.getlist('bezzwrotnie'):
+                        Vehicle.objects.filter(pk=int(input_id)).update(status='e', transfer_date=timezone.now())
+                    else:
+                        Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
             elif 'reject' in request.POST:
                 for input_id in id_list:
                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
