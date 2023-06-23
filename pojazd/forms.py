@@ -85,6 +85,14 @@ class AddVehicleForm(forms.ModelForm):
             visible.field.widget.attrs['placeholder'] = visible.field.label
         self.fields['tr'].widget.attrs['oninput'] = 'handleInput(event)'
 
+    def clean(self):
+        cleaned_data = super().clean()
+        transfer_date = cleaned_data.get('transfer_date')
+        status = cleaned_data['status']
+        if status == 'a' and transfer_date is not None:
+            raise ValidationError('Nie można ustawić statusu "Oczekuje", jeśli widnieje data pobrania.')
+
+    
     class Meta:
         model = models.Vehicle
         fields = '__all__'

@@ -84,3 +84,7 @@ h2 {
   margin: auto;
   text-align: center;
 }
+
+.errorlist {
+  color: red;
+}

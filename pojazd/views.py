@@ -123,7 +123,8 @@ class OrdersToDoView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class VehicleUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ A View to update particular Vehicle - url:'update/<int:pk>/' """
     model = Vehicle
-    fields = '__all__'
+    # fields = '__all__'
+    form_class = AddVehicleForm
     success_url = reverse_lazy('pojazd:list')
     permission_required = 'pojazd.change_vehicle'
     permission_denied_message = 'Nie masz uprawnień do tej zawartości'
@@ -150,19 +151,18 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
         # List of ids from vehicles with checked checkboxes
         order = Order.objects.get(pk=pk)
         statuses = dict(Vehicle.LOAN_STATUS)
-        print(request.POST)
         id_list = request.POST.getlist('boxes')
         if id_list:
             if 'save' in request.POST:
                 for input_id in id_list:
                     if input_id in request.POST.getlist('bezzwrotnie'):
-                        Vehicle.objects.filter(pk=int(input_id)).update(status='e', transfer_date=timezone.now())
+                        Vehicle.objects.filter(pk=int(input_id)).update(status='b', transfer_date=timezone.now())
                     else:
                         Vehicle.objects.filter(pk=int(input_id)).update(status='o', transfer_date=timezone.now())
             elif 'reject' in request.POST:
                 for input_id in id_list:
                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
-
+            
             return redirect('pojazd:list')
         else:
             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')

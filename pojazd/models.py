@@ -27,7 +27,7 @@ class Vehicle(models.Model):
         ('b', 'Bezzwrotnie')
     )
     status = models.CharField(max_length=1, blank=True, choices=LOAN_STATUS, default='a')
-    order = models.ForeignKey(Order, related_name="vehicles", on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Zamówienie')
+    order = models.ForeignKey(Order, related_name="vehicles", on_delete=models.CASCADE, verbose_name='Zamówienie', null=True)
     returner = models.ForeignKey(User, related_name='vehicles_returner', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Zwracający')
 
     def __str__(self) -> str:
@@ -40,7 +40,7 @@ class Vehicle(models.Model):
         if self.status == 'e':
             return f"Teczka {self.tr} zamówiona przez: {self.responsible_person} została odrzucona. Nr zamówienia: {self.order.id}."
         if self.status == 'b':
-            return f"Teczka {self.tr} zamówiona przez: {self.responsible_person} została pobrana bezzwrotnie."
+            return f"Teczka {self.tr} zamówiona przez: {self.responsible_person} została pobrana bezzwrotnie {self.transfer_date}."
     
     def get_fields(self):
         """Get all name and values from model fields"""
