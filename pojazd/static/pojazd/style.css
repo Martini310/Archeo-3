@@ -60,6 +60,11 @@ h2 {
   margin-left: 17%;
 }
 
+.order-button {
+  float: right;
+  margin-top: 10px;
+}
+
 .my-order-header {
   margin-top: 30px;
   width:60%; 

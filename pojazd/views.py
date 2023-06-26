@@ -19,7 +19,7 @@ def notification_context(request):
     transfers = Vehicle.objects.filter(transfering_to=request.user.id)
     orders = len([order for order in Order.objects.all() if any(
         [vehicle.status for vehicle in order.vehicles.all() if vehicle.status == 'a'])]) or 0
-    
+
     driver_transfers = Driver.objects.filter(transfering_to=request.user.id)
     driver_orders = len([order for order in DriverOrder.objects.all() if any(
         [driver.status for driver in order.drivers.all() if driver.status == 'a'])]) or 0
@@ -28,15 +28,15 @@ def notification_context(request):
     # You might want to use more unique names here, to avoid having these
     # variables clash with variables added by a view.  For example, `count` could easily
     # be used elsewhere.
-    return {'notifications': {'transfers': transfers, 
-                              'count_orders_to_do': orders, 
-                              'driver_transfers': driver_transfers, 
+    return {'notifications': {'transfers': transfers,
+                              'count_orders_to_do': orders,
+                              'driver_transfers': driver_transfers,
                               'count_driver_orders_to_do': driver_orders}}
 
 
 class HomeView(TemplateView):
     template_name = "home.html"
-    
+
 
 def list_view(request):
     vehicles, search = _search_vehicles(request)
@@ -73,7 +73,7 @@ class AddVehicle(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     success_url = reverse_lazy('pojazd:list')
     permission_required = 'pojazd.add_vehicle'
-    
+
 
 class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """ View to create a new Order. """
@@ -99,7 +99,7 @@ class MyOrderView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
                 Vehicle.objects.bulk_create([Vehicle(tr=row['tr'],
                                                      responsible_person=user,
                                                      order=order,
-                                                     comments=row['comments']) 
+                                                     comments=row['comments'])
                                                      for row in formset.cleaned_data if row.get('tr') is not None])
                 messages.success(request, 'Twoje zamówienie zostało wysłane poprawnie!')
                 return redirect(reverse_lazy("pojazd:list"))
@@ -141,12 +141,12 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
     permission_required = 'pojazd.change_vehicle'
     success_message = "Zmiany w zamówieniu zostały zapisane prawidłowo."
     permission_denied_message = "Nie masz dostępu do tej zawartości."
-    
+
     def get(self, request, pk):
         order = Order.objects.get(pk=pk)
         statuses = dict(Vehicle.LOAN_STATUS)
         return render(request, 'pojazd/order_detail.html', context={'order': order, 'statuses': statuses})
-    
+
     def post(self, request, pk):
         # List of ids from vehicles with checked checkboxes
         order = Order.objects.get(pk=pk)
@@ -162,7 +162,7 @@ class OrderDetails(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
             elif 'reject' in request.POST:
                 for input_id in id_list:
                     Vehicle.objects.filter(pk=int(input_id)).update(status='e')
-            
+
             return redirect('pojazd:list')
         else:
             messages.error(request,'Proszę zaznaczyć przynajmniej 1 pozycję')
@@ -181,13 +181,13 @@ class ReturnFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
     time = timezone.now()
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs() 
+        kwargs = super().get_form_kwargs()
         # Retrieve the value of 'returner' from the session
         returner_pk = self.request.session.get('returner')
         if returner_pk:
             returner = User.objects.get(pk=returner_pk)
             kwargs['initial'] = {'returner': returner}
-        
+
         return kwargs
 
     def form_valid(self, form):
@@ -230,13 +230,13 @@ class TransferVehicleView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMe
         if self.object.responsible_person != request.user:
             return HttpResponseForbidden("Can't touch this.")
         return handler
-    
+
     # Sending user object to the form, to verify which fields to display/remove
     def get_form_kwargs(self):
         kwargs = super(TransferVehicleView, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
         return kwargs
-    
+
 
 class AcceptTransferVehicleView(LoginRequiredMixin, ListView):
     template_name = 'pojazd/accept_vehicles.html'
