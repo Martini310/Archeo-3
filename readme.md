@@ -12,7 +12,7 @@ The third version of my Archeo App. This time in Django!
 
 # 🔍 General info
 
-Archeo app is a comprehensive solution for managing, control and monitoring different registers, list etc.
+Archeo app is a comprehensive solution for managing, control and monitoring different registers, lists etc.
 Beyond borrowing files from office archive, app will let for creating handover lists, transfer files between users and will support notifications.
 # 🛠️ Tech stack
 
@@ -25,6 +25,11 @@ Beyond borrowing files from office archive, app will let for creating handover l
 
 # 🏗️ Installation
 
+### Docker
+To run container with some sample data just type this command:
+```
+docker run -p 8000:8000 martin310/archeo3v1.0.0
+```
 
 
 ## Application view

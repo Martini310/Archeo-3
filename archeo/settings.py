@@ -36,7 +36,7 @@ SECRET_KEY = 'django-insecure-wo398v%csxc@6mam$zp+mlv26di-1s%fjhn(=soq7a^5nz08tw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["8cabc402-9646-4e01-87b2-906f89e89e01.id.repl.co", 'archeo-3.martini310.repl.co', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
