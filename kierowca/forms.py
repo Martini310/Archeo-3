@@ -41,6 +41,14 @@ class AddDriverForm(forms.ModelForm):
         self.fields['last_name'].widget.attrs['oninput'] = 'handleInput(event)'
         self.fields['zadanie_akt'].widget = forms.CheckboxInput()
 
+    def clean_status(self):
+        status = self.cleaned_data['status']
+        return_date = self.cleaned_data['return_date']
+
+        if return_date and status in 'ao':
+            raise ValidationError('Nie można ustawić statusu "Zwrócona" lub "Oczekuje" jeśli wpisano datę zwrotu')
+        return status
+
     class Meta:
         model = models.Driver
         fields = '__all__'

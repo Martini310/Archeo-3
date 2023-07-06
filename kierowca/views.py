@@ -60,7 +60,8 @@ class AddDriver(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 class DriverUpdateView(LoginRequiredMixin, UpdateView):
     """ A View to update particular Driver - url:'update/<int:pk>/' """
     model = Driver
-    fields = '__all__'
+    # fields = '__all__'
+    form_class = AddDriverForm
     success_url = reverse_lazy('kierowca:list')
     # permission_required = 'kierowca.change_driver'
     permission_denied_message = 'Nie masz uprawnień do tej zawartości'
