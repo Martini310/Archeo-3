@@ -89,9 +89,15 @@ class AddVehicleForm(forms.ModelForm):
         cleaned_data = super().clean()
         transfer_date = cleaned_data.get('transfer_date')
         status = cleaned_data['status']
+        return_date = cleaned_data.get('return_date')
+        
         if status == 'a' and transfer_date is not None:
             raise ValidationError('Nie można ustawić statusu "Oczekuje", jeśli widnieje data pobrania.')
 
+        if return_date and status in 'ao':
+            raise ValidationError('Nie można ustawić statusu "Zwrócona" lub "Oczekuje" jeśli wpisano datę zwrotu')
+        
+        return cleaned_data
     
     class Meta:
         model = models.Vehicle
