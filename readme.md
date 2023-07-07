@@ -32,7 +32,12 @@ docker run -p 8000:8000 martin310/archeo3v1.0.0
 ```
 
 # 💻 Application view
-In progress
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/721bcc82-615e-43e2-bf4b-585772aadc22" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/baef18e4-f351-4150-8e59-fc14c5ced668" width="40%" height="40%">
+
+
 
 # 🔧  Functionalities
 
