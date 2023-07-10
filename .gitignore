@@ -7,3 +7,4 @@ pyproject.toml
 replit.nix
 db.sqlite3
 .coverage
+.env

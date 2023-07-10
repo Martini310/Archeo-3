@@ -50,6 +50,7 @@
                         {% endif %}
                       {% endif %}
                     </td>
+                    {% if vehicle.status == 'a' %} 
                     <td onclick="checkCheckbox('bezzwrotnie-{{forloop.counter}}')">   
                       {% if event.approved %}
                         <div class="form-check" onclick="checkCheckbox('bezzwrotnie-{{forloop.counter}}')">
@@ -61,6 +62,9 @@
                           </div>
                       {% endif %}
                     </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
             </tbody>

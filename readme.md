@@ -18,6 +18,7 @@ Beyond borrowing files from office archive, app will let for creating handover l
 
 <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green">
 <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
+<img src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white">
 <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white">
 <img src="https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white">
 <br/>
@@ -25,10 +26,40 @@ Beyond borrowing files from office archive, app will let for creating handover l
 
 # 🏗️ Installation
 
-### Docker
+### **Docker**
 To run container with some sample data just type this command:
 ```
 docker run -p 8000:8000 martin310/archeo3v1.0.0
+```
+
+**Or** 
+
+you can copy repository and run server manually:
+```
+git pull https://github.com/Martini310/Archeo-3
+```
+Install dependencies
+```
+pip install requirements.txt
+```
+Set your username and password to postgres
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASS,
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+```
+and then in main project folder run this commands
+```
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
 ```
 
 # 💻 Application view
@@ -36,6 +67,18 @@ docker run -p 8000:8000 martin310/archeo3v1.0.0
 <img src="https://github.com/Martini310/Archeo-3/assets/108935246/721bcc82-615e-43e2-bf4b-585772aadc22" width="40%" height="40%">
 
 <img src="https://github.com/Martini310/Archeo-3/assets/108935246/baef18e4-f351-4150-8e59-fc14c5ced668" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/206bc324-2e43-4f59-b128-53a9fddbe8a2" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/4b8350a8-f2a7-4981-a182-76a201576fcf" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/10911107-08b0-44c3-b271-10567923fa4d" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/fb338866-71cd-426b-914b-bdf95cac7204" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/1e60fa6d-01c8-4c52-bc40-5b367435b1ea" width="40%" height="40%">
+
+<img src="https://github.com/Martini310/Archeo-3/assets/108935246/7e81e064-ace5-4695-a5ec-f3c57ca33ce0" width="40%" height="40%">
 
 
 
@@ -52,12 +95,12 @@ In this module You can manage and control the vehicle files that are taken or re
 7. Admin can add files directly without creating new order (in case of urgent need), or edit any case (eg. mistakes)
 8. Orders to do can be filtered by status. They also have a files to do/all summary. In case when file will be taken and never return, admin can mark it while accepting the order
 
-## Driver
+## 🚶 Driver
 This module is very similar to the Vehicle with some minor differences which I will describe here
 1. Searching is based on name, surname and PESEL number.
 2. Return is based on the PESEL number, and if the driver does not have a PESEL number, then according to the name, surname and date of birth.
 
-## 📒 Transfer List
+## 📃 Transfer List
 In this module users can create lists of drivers transfered to the archive.
 This is pretty simple
 1. User create a list of drivers with all needed informations.
@@ -67,6 +110,8 @@ This is pretty simple
 
 # ❓ Inspiration & Sources
 Like in previous version of this app, inspiration is the excessive bureaucracy and my faith that this all can be much simpler and faster.
+
+Sources.. Every single video about Django on YouTube :) Ok, not every single one but many many videos. Ofcourse StackOverflow had answer for most problems.
 
 # 📱 Contact
 If you have any questions or ideas for development feel free to contact me via email:</br>

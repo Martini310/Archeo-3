@@ -1,8 +1,8 @@
 {% extends 'base-vehicle.html' %}
 {% block content %}
 <div class="my-order-header">
-<h2><strong>Zamówienie na teczki</strong></h2>
-<span>Wpisz numery rejestracyjne teczek, które chcesz zamówić oraz ewentualne uwagi, które mogą pomóc w ich odnalezieniu.</span>
+    <h2><strong>Zamówienie na teczki</strong></h2>
+    <span>Wpisz numery rejestracyjne teczek, które chcesz zamówić oraz ewentualne uwagi, które mogą pomóc w ich odnalezieniu.</span>
 </div>
 <form class="my-order" id="form-container" method="POST">
     {% csrf_token %}
